@@ -40,6 +40,22 @@ async function run() {
         const serviceCollection = client.db('medical-website').collection('services')
         const bookingCollection = client.db('medical-website').collection('booking')
         const userCollection = client.db('medical-website').collection('user')
+        const docterCollection = client.db('medical-website').collection('docter')
+
+
+
+        const verifyAdmin = async (req, res, next) => {
+            const requester = req.decoded.email
+            const requesterAccount = await userCollection.findOne({ email: requester })
+            if (requesterAccount.role === 'admin') {
+                next()
+            }
+            else {
+                res.status(403).send({ message: 'Forbiden access' })
+            }
+        }
+
+
 
         app.get('/service', async (req, res) => {
             const query = {}
@@ -119,7 +135,15 @@ async function run() {
 
         // make admin
 
-        app.put('/user/admin/:email', verifyJWT, async (req, res) => {
+        app.get('/admin/:email', async (req, res) => {
+            const email = req.params.email
+            const user = await userCollection.findOne({ email: email })
+            const isAdmin = user.role === 'admin'
+            res.send({ admin: isAdmin })
+        })
+
+
+        app.put('/user/admin/:email', verifyJWT, verifyAdmin, async (req, res) => {
             const email = req.params.email
             const filter = { email: email }
             const updateDoc = {
@@ -139,7 +163,27 @@ async function run() {
             res.send({ admin: isAdmin })
         })
 
-        // 75.8
+        //add docter
+
+        app.post('/docter', verifyJWT, verifyAdmin, async (req, res) => {
+            const docter = req.body
+            const result = await docterCollection.insertOne(docter)
+            res.send(result)
+        })
+
+        //load all docter
+        app.get('/doctors', verifyJWT, verifyAdmin, async (req, res) => {
+            const doctors = await docterCollection.find().toArray()
+            res.send(doctors)
+        })
+
+
+        app.delete('/doctor/:email', verifyJWT, verifyAdmin, async (req, res) => {
+            const email = req.params.email;
+            const filter = { email: email };
+            const result = await docterCollection.deleteOne(filter);
+            res.send(result);
+        })
 
 
     } finally {
