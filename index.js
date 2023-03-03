@@ -36,7 +36,7 @@ async function run() {
 
     try {
 
-        await client.connect()
+        client.connect()
         const serviceCollection = client.db('medical-website').collection('services')
         const bookingCollection = client.db('medical-website').collection('booking')
         const userCollection = client.db('medical-website').collection('user')
@@ -211,14 +211,7 @@ async function run() {
             res.send(result)
         })
 
-        // get  admin
 
-        app.get('/admin/:email', async (req, res) => {
-            const email = req.params.email
-            const user = await userCollection.findOne({ email: email })
-            const isAdmin = user.role === 'admin'
-            res.send({ admin: isAdmin })
-        })
 
         //add docter
 
