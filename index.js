@@ -10,6 +10,12 @@ app.use(cors())
 app.use(express.json())
 
 
+const corsConfig = {
+    origin: "*",
+}
+app.use(cors(corsConfig))
+
+
 // mongodb connection
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.he6drsw.mongodb.net/?retryWrites=true&w=majority`;
