@@ -39,7 +39,7 @@ const getUsers = async (req: IMyRequest) => {
   const query = req?.query || {};
 
   const queryBuilder = new QueryBuilder(
-    User.find({ role: 'user' }),
+    User.find({ role: 'customar' }),
     query as Record<string, unknown>,
   );
 
@@ -52,6 +52,7 @@ const getUsers = async (req: IMyRequest) => {
     .paginate();
 
   const result = await queryBuilder.modelQuery;
+  console.log(result)
   const meta = await queryBuilder.countTotal();
   return { result, meta };
 };
