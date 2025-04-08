@@ -66,7 +66,7 @@ const createThirdCategory = async (payload: TThirdCategory) => {
 
 // Get all categories, subcategories, and third-level categories
 const getCategories = async () => {
-  const categories = await Category.find().select("category_name");
+  const categories = await ThirdCategory.find()
   // .populate({
   //   path: "subcategories",
   //   populate: { path: "thirdCategories" },
