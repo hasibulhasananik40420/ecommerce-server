@@ -17,7 +17,7 @@ router.get('/user/:id', auth('admin', 'user'), UserControllers.getUser);
 router.get('/get-me', auth('admin', 'user'), UserControllers.getMe);
 
 // Get all users
-router.get('/users',  auth(USER_ROLE.admin), UserControllers.getUsers);
+router.get('/users', UserControllers.getUsers);
 
 // Update an existing user
 router.put(
