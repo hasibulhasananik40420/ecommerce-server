@@ -8,7 +8,7 @@ import { generateSlug } from "../../utils/generateSlug";
 const createCategory = async (payload: TCategory) => {
   const { category_name } = payload;
   const slug = generateSlug(category_name);
-  console.log(slug)
+  console.log(slug);
   const existingCategory = await Category.findOne({ category_name });
   if (existingCategory) {
     throw forbidden("Category name already exists.");
@@ -37,9 +37,15 @@ const updateCategory = async (category_id: string, newCategoryName: string) => {
     throw notFound("Category not found.");
   }
 
+  if (category?.category_name === newCategoryName) {
+    throw forbidden("Category not update same name.");
+  }
+  const slug = generateSlug(newCategoryName);
   const existingCategory = await Category.findOne({
     category_name: newCategoryName,
+    slug,
   });
+
   if (existingCategory) {
     throw forbidden("Category with this name already exists.");
   }
