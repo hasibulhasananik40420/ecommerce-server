@@ -2,17 +2,19 @@ import { Category, Subcategory, ThirdCategory } from "./category.model";
 import { notFound, serverError, forbidden } from "../../utils/errorfunc";
 import { TCategory } from "./category.interface";
 import { Product } from "../Product/product.model";
+import { generateSlug } from "../../utils/generateSlug";
 
 // Create category (main, subcategory, or third-level)
 const createCategory = async (payload: TCategory) => {
   const { category_name } = payload;
-
+  const slug = generateSlug(category_name);
+  console.log(slug)
   const existingCategory = await Category.findOne({ category_name });
   if (existingCategory) {
     throw forbidden("Category name already exists.");
   }
 
-  const result = await Category.create({ category_name });
+  const result = await Category.create({ category_name, slug });
   return result;
 };
 

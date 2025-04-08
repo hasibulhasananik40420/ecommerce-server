@@ -6,6 +6,10 @@ const categorySchema = new Schema(
       type: String,
       required: true,
     },
+    slug: {
+      type: String,
+      required: true,
+    },
   },
   { timestamps: true }
 );
@@ -13,6 +17,10 @@ const categorySchema = new Schema(
 const subcategorySchema = new Schema(
   {
     category_name: {
+      type: String,
+      required: true,
+    },
+    slug: {
       type: String,
       required: true,
     },
@@ -28,6 +36,10 @@ const subcategorySchema = new Schema(
 const thirdCategorySchema = new Schema(
   {
     category_name: {
+      type: String,
+      required: true,
+    },
+    slug: {
       type: String,
       required: true,
     },

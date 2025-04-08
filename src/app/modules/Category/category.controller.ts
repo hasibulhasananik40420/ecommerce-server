@@ -1,13 +1,14 @@
-import httpStatus from 'http-status';
-import catchAsync from '../../utils/catchAsync';
-import sendResponse from '../../utils/sendResponse';
-import { CategoryServices } from './category.service';
+import httpStatus from "http-status";
+import catchAsync from "../../utils/catchAsync";
+import sendResponse from "../../utils/sendResponse";
+import { CategoryServices } from "./category.service";
+import { TCategory } from "./category.interface";
 
 // Create a new category (main, subcategory, or third-level)
 const createCategory = catchAsync(async (req, res) => {
-  const { category_name, type, parent_category_id } = req.body;
+  const { category_name } = req.body;
 
-  const result = await CategoryServices.createCategory({ category_name, type, parent_category_id });
+  const result = await CategoryServices.createCategory(req.body as TCategory);
 
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
@@ -24,7 +25,7 @@ const getCategories = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Categories retrieved successfully.',
+    message: "Categories retrieved successfully.",
     data: result,
   });
 });
@@ -33,7 +34,10 @@ const getCategories = catchAsync(async (req, res) => {
 const updateCategory = catchAsync(async (req, res) => {
   const { category_id, category_name } = req.body;
 
-  const result = await CategoryServices.updateCategory(category_id, category_name);
+  const result = await CategoryServices.updateCategory(
+    category_id,
+    category_name
+  );
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -52,7 +56,7 @@ const deleteCategory = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Category deleted successfully.',
+    message: "Category deleted successfully.",
     data: result,
   });
 });
