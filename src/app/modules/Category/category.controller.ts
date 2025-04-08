@@ -2,13 +2,26 @@ import httpStatus from "http-status";
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import { CategoryServices } from "./category.service";
-import { TCategory } from "./category.interface";
+import { TCategory, TSubCategory } from "./category.interface";
 
 // Create a new category (main, subcategory, or third-level)
 const createCategory = catchAsync(async (req, res) => {
   const { category_name } = req.body;
 
   const result = await CategoryServices.createCategory(req.body as TCategory);
+
+  sendResponse(res, {
+    statusCode: httpStatus.CREATED,
+    success: true,
+    message: `Category created successfully.`,
+    data: result,
+  });
+});
+
+// Create a new category (main, subcategory, or third-level)
+const createSubCategory = catchAsync(async (req, res) => {
+  
+  const result = await CategoryServices.createSubCategory(req.body as TSubCategory);
 
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
@@ -60,10 +73,25 @@ const deleteCategory = catchAsync(async (req, res) => {
     data: result,
   });
 });
+// Delete a category
+const deleteSubCategory = catchAsync(async (req, res) => {
+  const { category_id } = req.params;
+
+  const result = await CategoryServices.deleteSubCategory(category_id);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Category deleted successfully.",
+    data: result,
+  });
+});
 
 export const CategoryControllers = {
   createCategory,
+  createSubCategory,
   getCategories,
   updateCategory,
   deleteCategory,
+  deleteSubCategory
 };

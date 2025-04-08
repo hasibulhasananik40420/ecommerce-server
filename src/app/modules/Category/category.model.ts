@@ -16,7 +16,7 @@ const categorySchema = new Schema(
 
 const subcategorySchema = new Schema(
   {
-    category_name: {
+    sub_category_name: {
       type: String,
       required: true,
     },

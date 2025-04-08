@@ -5,8 +5,8 @@ export type TCategory = {
   slug: string;
 };
 
-export type TSubcategory = {
-  category_name: string;
+export type TSubCategory = {
+  sub_category_name: string;
   slug: string;
   parent_category_id: Schema.Types.ObjectId;
 };
