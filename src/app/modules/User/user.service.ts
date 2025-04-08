@@ -52,7 +52,6 @@ const getUsers = async (req: IMyRequest) => {
     .paginate();
 
   const result = await queryBuilder.modelQuery;
-  console.log(result);
   const meta = await queryBuilder.countTotal();
   return { result, meta };
 };
@@ -167,7 +166,7 @@ const createUser = async (payload: TUser & TProfile) => {
     <p>This code will expire shortly. Please use it as soon as possible.</p>
     <div class="footer">
       Need assistance? <a href="mailto:support@yourstore.com">support@yourstore.com</a><br>
-      &copy; 2025 YourStore
+      &copy; ${new Date().getFullYear()} YourStore
     </div>
   </div>
 </body>

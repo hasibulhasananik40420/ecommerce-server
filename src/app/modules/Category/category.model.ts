@@ -35,7 +35,7 @@ const subcategorySchema = new Schema(
 
 const thirdCategorySchema = new Schema(
   {
-    category_name: {
+    third_category_name: {
       type: String,
       required: true,
     },

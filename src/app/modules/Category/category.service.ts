@@ -1,6 +1,6 @@
 import { Category, Subcategory, ThirdCategory } from "./category.model";
 import { notFound, serverError, forbidden } from "../../utils/errorfunc";
-import { TCategory, TSubCategory } from "./category.interface";
+import { TCategory, TSubCategory, TThirdCategory } from "./category.interface";
 import { Product } from "../Product/product.model";
 import { generateSlug } from "../../utils/generateSlug";
 
@@ -38,9 +38,46 @@ const createSubCategory = async (payload: TSubCategory) => {
   return result;
 };
 
+const createThirdCategory = async (payload: TThirdCategory) => {
+  const { third_category_name, parent_category_id, sub_category_id } = payload;
+  const subCategory = await Subcategory.findById(sub_category_id);
+  const category = await Category.findById(parent_category_id);
+
+  if (!subCategory) {
+    throw notFound("Sub category not found.");
+  }
+  if (!category) {
+    throw notFound("Category not found.");
+  }
+  const slug = generateSlug(third_category_name);
+  const existingCategory = await Subcategory.findOne({ third_category_name });
+  if (existingCategory) {
+    throw forbidden("Category name already exists.");
+  }
+
+  const result = await ThirdCategory.create({
+    third_category_name,
+    slug,
+    parent_category_id,
+    sub_category_id,
+  });
+  return result;
+};
+
 // Get all categories, subcategories, and third-level categories
 const getCategories = async () => {
   const categories = await Category.find().select("category_name");
+  // .populate({
+  //   path: "subcategories",
+  //   populate: { path: "thirdCategories" },
+  // })
+  // .exec();
+  return categories;
+};
+
+// Get all categories, subcategories, and third-level categories
+const getSubCategories = async () => {
+  const categories = await Subcategory.find();
   // .populate({
   //   path: "subcategories",
   //   populate: { path: "thirdCategories" },
@@ -93,10 +130,9 @@ const deleteCategory = async (category_id: string) => {
   }
 
   // Delete the category
-  // await category.remove();
-  return category;
+  const result = await Category.findByIdAndDelete(category_id);
+  return result;
 };
-
 
 // Delete a category (if no product exists under it)
 const deleteSubCategory = async (category_id: string) => {
@@ -115,14 +151,16 @@ const deleteSubCategory = async (category_id: string) => {
   }
 
   // Delete the category
-  // await category.remove();
-  return category;
+  const result = await Subcategory.findByIdAndDelete(category_id);
+  return result;
 };
 
 export const CategoryServices = {
   createCategory,
   createSubCategory,
+  createThirdCategory,
   getCategories,
+  getSubCategories,
   updateCategory,
   deleteCategory,
   deleteSubCategory,
