@@ -1,28 +1,28 @@
-import { Schema, model } from 'mongoose';
-import { TProfile, TUser } from './user.interface';
+import { Schema, model } from "mongoose";
+import { TProfile, TUser } from "./user.interface";
 
 const userSchema = new Schema<TUser & TProfile>(
   {
     profileId: {
       type: Schema.Types.ObjectId,
-      ref: 'Profiles',
+      ref: "Profiles",
     },
     email: {
       type: String,
       required: true,
       trim: true,
     },
-    
+
     role: {
       type: String,
-      enum: ['customar', 'admin'],
-      default: 'customar',
+      enum: ["customar", "admin"],
+      default: "customar",
       trim: true,
     },
     status: {
       type: String,
-      enum: ['active', 'de-active'],
-      default: 'active',
+      enum: ["active", "de-active"],
+      default: "active",
       trim: true,
     },
     password: {
@@ -45,7 +45,7 @@ const userSchema = new Schema<TUser & TProfile>(
   },
   {
     timestamps: true,
-  },
+  }
 );
 
 const profileSchema = new Schema<TProfile>(
@@ -59,22 +59,30 @@ const profileSchema = new Schema<TProfile>(
       type: String,
       trim: true,
     },
-    
+
     email: {
       type: String,
       required: true,
       unique: true,
       trim: true,
     },
+    birthDate: {
+      type: Date,
+      required: false,
+    },
     image: {
+      type: String,
+      required: false,
+    },
+    address: {
       type: String,
       required: false,
     },
   },
   {
     timestamps: true,
-  },
+  }
 );
 
-export const Profile = model<TProfile>('Profiles', profileSchema);
-export const User = model<TUser & TProfile>('Users', userSchema);
+export const Profile = model<TProfile>("Profiles", profileSchema);
+export const User = model<TUser & TProfile>("Users", userSchema);

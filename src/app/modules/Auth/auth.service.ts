@@ -346,6 +346,7 @@ const sendOPTPhone = async (phone: string) => {
 };
 
 const verification = async (payload: TVerification) => {
+  console.log(payload)
   const user = await User.findOne({ email: payload.email }).select(
     'verification',
   );
@@ -434,60 +435,81 @@ const verificationCodeReSend = async (payload: TUser & TProfile) => {
   const emailData: TEmailInfo = {
     email: payload?.email,
     body: `
-       <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Verify OTP to Change Password</title>
-    <style>
-      svg {
-        height: 30px !important;
+        <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Verify Email</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Sora', sans-serif;
+      background: #1a1a1a;
+      color: #f1f1f1;
+    }
+   
+    .container {
+      max-width: 520px;
+      margin: 40px auto;
+      background: #2c2c2c;
+      border-radius: 10px;
+      padding: 40px 30px;
+      text-align: center;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+    }
+    h2 {
+      font-size: 22px;
+      margin-bottom: 16px;
+       color: #f1f1f1;
+    }
+    p {
+      color: #ccc;
+      font-size: 15px;
+    }
+    .code {
+      font-size: 30px;
+      background: #000;
+      padding: 14px 30px;
+      border-radius: 8px;
+      letter-spacing: 10px;
+      font-weight: 600;
+      color: #00ffcc;
+      display: inline-block;
+      margin: 25px 0;
+    }
+    .footer {
+      margin-top: 30px;
+      font-size: 13px;
+      color: #888;
+    }
+    a {
+      color: #00ffcc;
+      text-decoration: none;
+    }
+    @media(max-width: 600px) {
+      .code {
+        font-size: 24px;
+        letter-spacing: 6px;
+        padding: 12px 20px;
       }
-    </style>
-  </head>
-  <body style="font-family: Arial, sans-serif;  color: #fff; margin: 0; padding: 0;">
-    <table width="100%" cellspacing="0" cellpadding="0" border="0" align="center">
-      <tr>
-        <td align="center">
-          <table width="100%" max-width="600" cellspacing="0" cellpadding="0" border="0" style="background-color: #111; border-radius: 8px; box-shadow: 0 4px 8px rgba(255, 255, 0, 0.2); text-align: center;">
-            <!-- Header with Logo -->
-            <tr>
-              <td style="background-color: #ffed00; padding: 10px; text-align: center;">
-              
-          <img src="https://res.cloudinary.com/dssmacjme/image/upload/v1741600767/vr4iqumzttiqefri1h3n.jpg" alt="Skillion" height="30" class="CToWUd" data-bit="iit">
-        
-              </td>
-            </tr>
-            <!-- OTP Section -->
-            <tr>
-              <td style="padding: 20px;">
-                <h2 style="color: #fff; font-size: 24px;">🔐 Verify Your OTP</h2>
-                <table align="center" style="background-color: #222; padding: 10px; border-radius: 5px;">
-                  <tr>
-                    <td style="font-size: 28px; font-weight: bold; color: #ffed00;">${code}</td>
-                  </tr>
-                </table>
-                <p style="font-size: 14px; color: red; margin-top: 10px; font-weight: bold;">
-                  ⚠ This OTP is valid for **only 5 minutes**. Please use it before it expires!
-                </p>
-                <p style="font-size: 14px; color: #bbb; margin-top: 10px;">For security reasons, never share your OTP with anyone.</p>
-              </td>
-            </tr>
-            <!-- Footer Links -->
-            <tr>
-              <td style="background-color: #000; padding: 15px; text-align: center; font-size: 14px;">
-                <a href="https://www.facebook.com/skilliontech.official" target="_blank" style="color: #ffed00; text-decoration: none; margin: 0 10px;">Facebook</a>
-                <a href="https://www.youtube.com/@SkillionTech" target="_blank" style="color: #ffed00; text-decoration: none; margin: 0 10px;">YouTube</a>
-                <a href="https://www.tiktok.com/@skilliontech" target="_blank" style="color: #ffed00; text-decoration: none; margin: 0 10px;">TikTok</a>
-                <a href="https://www.linkedin.com/company/skilliontech" target="_blank" style="color: #ffed00; text-decoration: none; margin: 0 10px;">LinkedIn</a>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-    </table>
-  </body>
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Verify Your Account</h2>
+    <p>Your one-time verification code is:</p>
+    <div class="code">${code}</div>
+    <p>This code will expire shortly. Please use it as soon as possible.</p>
+    <div class="footer">
+      Need assistance? <a href="mailto:support@yourstore.com">support@yourstore.com</a><br>
+      &copy; ${new Date().getFullYear()} YourStore
+    </div>
+  </div>
+</body>
 </html>`,
     subject: 'Verify OTP to Change Password',
   };

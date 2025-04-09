@@ -11,10 +11,10 @@ const router = express.Router();
 router.post('/create-user', UserControllers.createUser);
 
 // Get a single user
-router.get('/user/:id', auth('admin', 'user'), UserControllers.getUser);
+router.get('/user/:id', auth('admin', 'customar'), UserControllers.getUser);
 
 // Get a me 
-router.get('/get-me', auth('admin', 'user'), UserControllers.getMe);
+router.get('/get-me', auth('admin', 'customar'), UserControllers.getMe);
 
 // Get all users
 router.get('/users', UserControllers.getUsers);
@@ -27,7 +27,7 @@ router.put(
     req.body = JSON.parse(req.body.data);
     next();
   },
-  auth('admin', 'user'),
+  auth('admin', 'customar'),
   UserControllers.updateUser,
 );
 

@@ -1,6 +1,6 @@
-import { Schema } from 'mongoose';
-import { USER_ROLE } from './user.constant';
-import { BaseType } from '../../utils/utils.interface';
+import { Schema } from "mongoose";
+import { USER_ROLE } from "./user.constant";
+import { BaseType } from "../../utils/utils.interface";
 
 export type TVerification = BaseType & {
   code: string;
@@ -12,20 +12,20 @@ export type TVerification = BaseType & {
 export type TUser = BaseType & {
   profileId: Schema.Types.ObjectId;
   email: string;
-  role: 'customar' | 'admin';
+  role: "customar" | "admin";
   password: string;
-  status: 'active' | 'de-active';
+  status: "active" | "de-active";
   verification?: TVerification;
   rememberPassword: boolean;
 };
-
-
 
 // Represents a profile type.
 export type TProfile = BaseType & {
   name: string;
   email: string;
   phone?: string;
+  birthDate?: Date;
+  address?: string;
   image?: string;
 };
 
