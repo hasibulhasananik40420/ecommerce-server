@@ -10,7 +10,7 @@ const auth = (...requiredRoles: TUserRole[]) => {
   return catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const token =
       req.headers.authorization;
-      console.log(token)
+      
 
     // checking if the token is missing
     if (!token) {
@@ -31,7 +31,7 @@ const auth = (...requiredRoles: TUserRole[]) => {
       return;
     }
 
-    const { email, role, _id } = decoded;
+    const { email, role } = decoded;
 
 
     // Find the full user information by email
@@ -57,8 +57,10 @@ const auth = (...requiredRoles: TUserRole[]) => {
       throw unauthorized('You are not authorized!');
     }
 
+    
+
     // Attach full user information to the request object
-    req.user = { ...decoded, role, email, id : _id };
+    req.user = { ...decoded, role, email};
 
     next();
   });

@@ -6,8 +6,7 @@ import { UserServices } from './user.service';
 
 // Get a single user
 const getMe = catchAsync(async (req, res) => {
-  console.log(req?.user)
-  const result = await UserServices.getMe(req?.user?.email);
+  const result = await UserServices.getMe(req?.user?.id);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

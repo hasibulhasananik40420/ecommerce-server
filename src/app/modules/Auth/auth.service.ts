@@ -162,8 +162,10 @@ const refreshToken = async (req: any, res: any) => {
     },
   );
 
+
   const jwtPayload = {
     email: user?.email,
+    id: user?._id,
     role: user?.role,
   };
 

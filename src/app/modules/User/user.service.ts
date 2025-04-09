@@ -20,8 +20,10 @@ const getUser = async (id: string) => {
   return user;
 };
 
-const getMe = async (users: string) => {
-  const user = await User.findOne({ email: users })
+const getMe = async (id: string) => {
+
+  console.log(id)
+  const user = await User.findById(id)
     .populate("profileId")
     .select("-verification");
 
