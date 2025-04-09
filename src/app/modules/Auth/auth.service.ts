@@ -62,11 +62,14 @@ const loginUser = async (payload: TLoginUser) => {
 
   const jwtPayload = {
     email: user?.email,
-    firstName: isProfile?.name,
+    name: isProfile?.name,
     phone: isProfile?.phone,
+    profile: isProfile?._id,
     id: user?._id,
     role: user?.role,
   };
+
+  console.log(jwtPayload)
 
   
 
@@ -539,7 +542,7 @@ const setNewPassword = async (token: string, password: string) => {
 
   // Checking if the user exists
   const user = (await User.findOne({ email }).select(
-    'email status -_id',
+    'email status',
   )) as unknown as TUser;
 
   if (!user) {
