@@ -194,7 +194,7 @@ const createUser = async (payload: TUser & TProfile) => {
 };
 
 // Update an existing user
-const updateUser = async (req: any) => {
+const updateProfile = async (req: any) => {
   const id: string = req?.user?.id;
   const payload: TUser & TProfile = req?.body;
   const file: any = req?.file;
@@ -250,6 +250,6 @@ export const UserServices = {
   getMe,
   getUsers,
   createUser,
-  updateUser,
+  updateProfile,
   deleteUser,
 };

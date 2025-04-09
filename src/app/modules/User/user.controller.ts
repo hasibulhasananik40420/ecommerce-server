@@ -51,8 +51,8 @@ const createUser = catchAsync(async (req, res) => {
 
 
 // Update an existing user
-const updateUser = catchAsync(async (req, res) => {
-  const result = await UserServices.updateUser(req);
+const updateProfile = catchAsync(async (req, res) => {
+  const result = await UserServices.updateProfile(req);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -77,6 +77,6 @@ export const UserControllers = {
   getMe,
   getUsers,
   createUser,
-  updateUser,
+  updateProfile,
   deleteUser,
 };

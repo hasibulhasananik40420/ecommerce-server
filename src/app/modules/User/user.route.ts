@@ -21,14 +21,14 @@ router.get('/users', UserControllers.getUsers);
 
 // Update an existing user
 router.put(
-  '/update-user',
+  '/update-profile',
   upload.single('file'),
   (req: Request, res: Response, next: NextFunction) => {
     req.body = JSON.parse(req.body.data);
     next();
   },
   auth('admin', 'customar'),
-  UserControllers.updateUser,
+  UserControllers.updateProfile,
 );
 
 // Delete a user
