@@ -82,7 +82,7 @@ router.put('/resend-verification-code', AuthControllers.verificationCodeReSend);
  *  */ 
 router.put(
   '/change-password',
-  auth(USER_ROLE.admin, USER_ROLE.user),
+  auth(USER_ROLE.admin, USER_ROLE.customar),
   AuthControllers.changePassword,
 );
 

@@ -19,12 +19,42 @@ const sendResponse_1 = __importDefault(require("../../utils/sendResponse"));
 const category_service_1 = require("./category.service");
 // Create a new category (main, subcategory, or third-level)
 const createCategory = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { category_name, type, parent_category_id } = req.body;
-    const result = yield category_service_1.CategoryServices.createCategory({ category_name, type, parent_category_id });
+    const { category_name } = req.body;
+    const result = yield category_service_1.CategoryServices.createCategory(req.body);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.CREATED,
         success: true,
-        message: `Category "${category_name}" created successfully.`,
+        message: `Category created successfully.`,
+        data: result,
+    });
+}));
+// Create a new category (main, subcategory, or third-level)
+const createSubCategory = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield category_service_1.CategoryServices.createSubCategory(req.body);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.CREATED,
+        success: true,
+        message: `Category created successfully.`,
+        data: result,
+    });
+}));
+// Create a new category (main, subcategory, or third-level)
+const createThirdCategory = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield category_service_1.CategoryServices.createThirdCategory(req.body);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.CREATED,
+        success: true,
+        message: `Category created successfully.`,
+        data: result,
+    });
+}));
+// Get all categories (including nested subcategories and third categories)
+const getSubCategories = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield category_service_1.CategoryServices.getSubCategories();
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: "Categories retrieved successfully.",
         data: result,
     });
 }));
@@ -34,7 +64,7 @@ const getCategories = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, 
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: 'Categories retrieved successfully.',
+        message: "Categories retrieved successfully.",
         data: result,
     });
 }));
@@ -56,13 +86,28 @@ const deleteCategory = (0, catchAsync_1.default)((req, res) => __awaiter(void 0,
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: 'Category deleted successfully.',
+        message: "Category deleted successfully.",
+        data: result,
+    });
+}));
+// Delete a category
+const deleteSubCategory = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { category_id } = req.params;
+    const result = yield category_service_1.CategoryServices.deleteSubCategory(category_id);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: "Category deleted successfully.",
         data: result,
     });
 }));
 exports.CategoryControllers = {
     createCategory,
+    createSubCategory,
+    createThirdCategory,
     getCategories,
+    getSubCategories,
     updateCategory,
     deleteCategory,
+    deleteSubCategory
 };

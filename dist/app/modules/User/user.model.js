@@ -5,7 +5,7 @@ const mongoose_1 = require("mongoose");
 const userSchema = new mongoose_1.Schema({
     profileId: {
         type: mongoose_1.Schema.Types.ObjectId,
-        ref: 'Profiles',
+        ref: "Profiles",
     },
     email: {
         type: String,
@@ -14,14 +14,14 @@ const userSchema = new mongoose_1.Schema({
     },
     role: {
         type: String,
-        enum: ['customar', 'admin'],
-        default: 'customar',
+        enum: ["customar", "admin"],
+        default: "customar",
         trim: true,
     },
     status: {
         type: String,
-        enum: ['active', 'de-active'],
-        default: 'active',
+        enum: ["active", "de-active"],
+        default: "active",
         trim: true,
     },
     password: {
@@ -60,12 +60,20 @@ const profileSchema = new mongoose_1.Schema({
         unique: true,
         trim: true,
     },
+    birthDate: {
+        type: Date,
+        required: false,
+    },
     image: {
+        type: String,
+        required: false,
+    },
+    address: {
         type: String,
         required: false,
     },
 }, {
     timestamps: true,
 });
-exports.Profile = (0, mongoose_1.model)('Profiles', profileSchema);
-exports.User = (0, mongoose_1.model)('Users', userSchema);
+exports.Profile = (0, mongoose_1.model)("Profiles", profileSchema);
+exports.User = (0, mongoose_1.model)("Users", userSchema);

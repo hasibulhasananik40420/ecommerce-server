@@ -50,5 +50,5 @@ router.put('/resend-verification-code', auth_controller_1.AuthControllers.verifi
  * }
  
  *  */
-router.put('/change-password', (0, auth_1.default)(user_constant_1.USER_ROLE.admin, user_constant_1.USER_ROLE.user), auth_controller_1.AuthControllers.changePassword);
+router.put('/change-password', (0, auth_1.default)(user_constant_1.USER_ROLE.admin, user_constant_1.USER_ROLE.customar), auth_controller_1.AuthControllers.changePassword);
 exports.AuthRoutes = router;

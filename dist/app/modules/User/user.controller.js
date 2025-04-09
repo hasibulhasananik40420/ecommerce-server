@@ -62,8 +62,8 @@ const createUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, voi
     });
 }));
 // Update an existing user
-const updateUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield user_service_1.UserServices.updateUser(req);
+const updateProfile = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield user_service_1.UserServices.updateProfile(req);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
@@ -86,6 +86,6 @@ exports.UserControllers = {
     getMe,
     getUsers,
     createUser,
-    updateUser,
+    updateProfile,
     deleteUser,
 };
