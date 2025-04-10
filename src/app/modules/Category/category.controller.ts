@@ -2,14 +2,17 @@ import httpStatus from "http-status";
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import { CategoryServices } from "./category.service";
-import { TCategory, TSubCategory, TThirdCategory } from "./category.interface";
+import {
+  TCategory,
+  TMainCategory,
+  TSubCategory2,
+  TThirdCategory,
+} from "./category.interface";
+
 
 // Create a new category (main, subcategory, or third-level)
 const createCategory = catchAsync(async (req, res) => {
-  const { category_name } = req.body;
-
   const result = await CategoryServices.createCategory(req.body as TCategory);
-
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
     success: true,
@@ -19,10 +22,8 @@ const createCategory = catchAsync(async (req, res) => {
 });
 
 // Create a new category (main, subcategory, or third-level)
-const createSubCategory = catchAsync(async (req, res) => {
-  
-  const result = await CategoryServices.createSubCategory(req.body as TSubCategory);
-
+const getMainCategories = catchAsync(async (req, res) => {
+  const result = await CategoryServices.getMainCategories();
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
     success: true,
@@ -31,22 +32,10 @@ const createSubCategory = catchAsync(async (req, res) => {
   });
 });
 
-// Create a new category (main, subcategory, or third-level)
-const createThirdCategory = catchAsync(async (req, res) => {
-  
-  const result = await CategoryServices.createThirdCategory(req.body as TThirdCategory);
-
-  sendResponse(res, {
-    statusCode: httpStatus.CREATED,
-    success: true,
-    message: `Category created successfully.`,
-    data: result,
-  });
-});
 
 // Get all categories (including nested subcategories and third categories)
 const getSubCategories = catchAsync(async (req, res) => {
-  const result = await CategoryServices.getSubCategories();
+  const result = await CategoryServices.getSubCategories(req?.params?.category as string);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -114,11 +103,10 @@ const deleteSubCategory = catchAsync(async (req, res) => {
 
 export const CategoryControllers = {
   createCategory,
-  createSubCategory,
-  createThirdCategory,
+  getMainCategories,
   getCategories,
   getSubCategories,
   updateCategory,
   deleteCategory,
-  deleteSubCategory
+  deleteSubCategory,
 };

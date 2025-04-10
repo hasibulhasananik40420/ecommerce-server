@@ -69,7 +69,7 @@ const loginUser = async (payload: TLoginUser) => {
     role: user?.role,
   };
 
-  console.log(jwtPayload)
+  
 
   
 

@@ -1,6 +1,6 @@
 import { Schema, model } from "mongoose";
 
-const categorySchema = new Schema(
+const mainCategorySchema = new Schema(
   {
     category_name: {
       type: String,
@@ -14,7 +14,7 @@ const categorySchema = new Schema(
   { timestamps: true }
 );
 
-const subcategorySchema = new Schema(
+const subcategorySchema2 = new Schema(
   {
     sub_category_name: {
       type: String,
@@ -57,6 +57,53 @@ const thirdCategorySchema = new Schema(
   { timestamps: true }
 );
 
-export const Category = model("Category", categorySchema);
-export const Subcategory = model("Subcategory", subcategorySchema);
+
+
+
+
+
+export const MainCategory = model("maincategory", mainCategorySchema);
+export const Subcategory = model("Subcategory", subcategorySchema2);
 export const ThirdCategory = model("ThirdCategory", thirdCategorySchema);
+
+
+
+
+
+// Item Schema (3rd-level category)
+const itemSchema = new Schema({
+  item_name: { type: String, required: true },
+  slug: { type: String }
+});
+ 
+const subcategorySchema = new Schema({
+  subcategory_name: { type: String, required: true },
+  slug: { type: String},
+  items: [itemSchema]  
+});
+
+// Category Schema (Main category)
+const categorySchema = new Schema({
+  category_name: { type: String, required: true },
+  slug: { type: String},
+  subcategories: [subcategorySchema]  
+}); 
+
+
+export const Category = model<CategoryDocument>('Category', categorySchema);
+
+
+
+// TypeScript Interface for Category Document
+interface CategoryDocument extends Document {
+  category_name: string;
+  slug: string;
+  subcategories: {
+    subcategory_name: string;
+    slug: string;
+    items: {
+      item_name: string;
+      slug: string;
+    }[];
+  }[];
+}

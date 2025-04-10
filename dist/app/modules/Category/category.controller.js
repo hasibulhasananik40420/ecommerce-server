@@ -18,9 +18,9 @@ const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
 const sendResponse_1 = __importDefault(require("../../utils/sendResponse"));
 const category_service_1 = require("./category.service");
 // Create a new category (main, subcategory, or third-level)
-const createCategory = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const createMainCategory = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { category_name } = req.body;
-    const result = yield category_service_1.CategoryServices.createCategory(req.body);
+    const result = yield category_service_1.CategoryServices.createMainCategory(req.body);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.CREATED,
         success: true,
@@ -102,7 +102,7 @@ const deleteSubCategory = (0, catchAsync_1.default)((req, res) => __awaiter(void
     });
 }));
 exports.CategoryControllers = {
-    createCategory,
+    createMainCategory,
     createSubCategory,
     createThirdCategory,
     getCategories,

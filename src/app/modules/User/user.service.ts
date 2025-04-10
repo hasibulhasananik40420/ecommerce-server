@@ -22,7 +22,7 @@ const getUser = async (id: string) => {
 
 const getMe = async (id: string) => {
 
-  console.log(id)
+  
   const user = await User.findById(id)
     .populate("profileId")
     .select("-verification");

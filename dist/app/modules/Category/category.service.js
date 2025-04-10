@@ -15,7 +15,7 @@ const errorfunc_1 = require("../../utils/errorfunc");
 const product_model_1 = require("../Product/product.model");
 const generateSlug_1 = require("../../utils/generateSlug");
 // Create category (main, subcategory, or third-level)
-const createCategory = (payload) => __awaiter(void 0, void 0, void 0, function* () {
+const createMainCategory = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const { category_name } = payload;
     const slug = (0, generateSlug_1.generateSlug)(category_name);
     const existingCategory = yield category_model_1.Category.findOne({ category_name });
@@ -69,6 +69,7 @@ const createThirdCategory = (payload) => __awaiter(void 0, void 0, void 0, funct
 // Get all categories, subcategories, and third-level categories
 const getCategories = () => __awaiter(void 0, void 0, void 0, function* () {
     const categories = yield category_model_1.ThirdCategory.find();
+    console.log(categories);
     // .populate({
     //   path: "subcategories",
     //   populate: { path: "thirdCategories" },
@@ -138,7 +139,7 @@ const deleteSubCategory = (category_id) => __awaiter(void 0, void 0, void 0, fun
     return result;
 });
 exports.CategoryServices = {
-    createCategory,
+    createMainCategory,
     createSubCategory,
     createThirdCategory,
     getCategories,

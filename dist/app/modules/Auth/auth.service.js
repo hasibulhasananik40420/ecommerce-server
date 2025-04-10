@@ -88,8 +88,9 @@ const loginUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     yield user.save();
     const jwtPayload = {
         email: user === null || user === void 0 ? void 0 : user.email,
-        firstName: isProfile === null || isProfile === void 0 ? void 0 : isProfile.name,
+        name: isProfile === null || isProfile === void 0 ? void 0 : isProfile.name,
         phone: isProfile === null || isProfile === void 0 ? void 0 : isProfile.phone,
+        profile: isProfile === null || isProfile === void 0 ? void 0 : isProfile._id,
         id: user === null || user === void 0 ? void 0 : user._id,
         role: user === null || user === void 0 ? void 0 : user.role,
     };
@@ -146,6 +147,7 @@ const refreshToken = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     });
     const jwtPayload = {
         email: user === null || user === void 0 ? void 0 : user.email,
+        id: user === null || user === void 0 ? void 0 : user._id,
         role: user === null || user === void 0 ? void 0 : user.role,
     };
     const accessToken = (0, auth_utils_1.createToken)(jwtPayload, config_1.default.jwt_access_secret, config_1.jwt_access_expires_in);
@@ -444,7 +446,7 @@ const setNewPassword = (token, password) => __awaiter(void 0, void 0, void 0, fu
     const decoded = (0, auth_utils_1.verifyToken)(token, config_1.default.jwt_refresh_secret);
     const { email } = decoded;
     // Checking if the user exists
-    const user = (yield user_model_1.User.findOne({ email }).select('email status -_id'));
+    const user = (yield user_model_1.User.findOne({ email }).select('email status'));
     if (!user) {
         throw (0, errorfunc_1.notFound)('User not found!');
     }

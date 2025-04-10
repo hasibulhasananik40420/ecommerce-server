@@ -8,7 +8,7 @@ const express_1 = __importDefault(require("express"));
 const category_controller_1 = require("./category.controller");
 const router = express_1.default.Router();
 // Create a new category
-router.post('/create-category', category_controller_1.CategoryControllers.createCategory);
+router.post('/create-category', category_controller_1.CategoryControllers.createMainCategory);
 router.post('/create-sub-category', category_controller_1.CategoryControllers.createSubCategory);
 router.post('/create-third-category', category_controller_1.CategoryControllers.createThirdCategory);
 // Get all categories

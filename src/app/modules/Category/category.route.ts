@@ -5,12 +5,11 @@ const router = express.Router();
 
 // Create a new category
 router.post('/create-category', CategoryControllers.createCategory);
-router.post('/create-sub-category', CategoryControllers.createSubCategory);
-router.post('/create-third-category', CategoryControllers.createThirdCategory);
+router.get('/main-categories', CategoryControllers.getMainCategories);
 
 // Get all categories
 router.get('/categories', CategoryControllers.getCategories);
-router.get('/sub-categories', CategoryControllers.getSubCategories);
+router.get('/sub-categories/:category', CategoryControllers.getSubCategories);
 
 // Update an existing category
 router.put('/update-category', CategoryControllers.updateCategory);
