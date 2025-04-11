@@ -7,14 +7,9 @@ import globalErrorHandler from './app/middlewares/globalErrorhandler';
 import router from './app/routes';
 import cookieParser from 'cookie-parser';
 import notFound from './app/middlewares/notFound';
+import compression from 'compression';
 import { databaseConnecting } from './app/config/database.config';
-
-// import {
-//   paymentCancel,
-//   paymentFailed,
-//   paymentSuccess,
-//   validationPayment,
-// } from './app/modules/payment/payment.service';
+ 
 import axios from 'axios';
 import config from './app/config';
 
@@ -119,13 +114,8 @@ app.get('/api/v1/posts', async (req, res) => {
   return url
 });
 
-
-
-// app.post('/api/payment-confirmation/:id', paymentSuccess);
-// app.post('/ipn_listener', validationPayment);
-// app.post('/api/payment-failed', paymentFailed);
-// app.post('/api/payment-cancel', paymentCancel);
-
+ 
+app.use(compression()); 
 app.use('/api/v1', router);
 app.use(notFound);
 app.use(globalErrorHandler);

@@ -33,11 +33,11 @@ const productSchema = new Schema(
         values: [String],
       },
     ],
-    primary_image: {
-      type: String,
-      required: true,
-    },
-    gallery_images: [String],
+    // primary_image: {
+    //   type: String,
+    //   required: true,
+    // },
+    // gallery_images: [String],
     weight: {
       type: Number,
       default: null,
@@ -46,7 +46,7 @@ const productSchema = new Schema(
       length: { type: Number, default: null },
       width: { type: Number, default: null },
       height: { type: Number, default: null },
-    },
+    }, 
     categories: [{
       type: Schema.Types.ObjectId,
       ref: 'Category',

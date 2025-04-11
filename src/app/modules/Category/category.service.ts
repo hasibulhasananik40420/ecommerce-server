@@ -74,8 +74,7 @@ const createCategory = async (payload: TCategory) => {
 
 // Get all categories, subcategories, and third-level categories
 const getCategories = async () => {
-  const reslut = await Category.find();
-  console.log(reslut);
+  const reslut = await Category.find().lean();
   return reslut;
 };
 
@@ -100,15 +99,6 @@ const getSubCategories = async (category_name: string) => {
     return result ? result.subcategories : [];
 };
 
-
-// const getThirtCategories = async (query : any) => {
-  
-//    console.log(query)
-//     const result = await Category.findOne({ category_name : query?.category_name }).select('subcategories');
-
-//     return result ? result.subcategories : [];
-
-// };
 
 
 const getThirtCategories = async (query: any) => {
