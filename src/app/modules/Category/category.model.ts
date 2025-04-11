@@ -1,98 +1,29 @@
 import { Schema, model } from "mongoose";
-
-const mainCategorySchema = new Schema(
-  {
-    category_name: {
-      type: String,
-      required: true,
-    },
-    slug: {
-      type: String,
-      required: true,
-    },
-  },
-  { timestamps: true }
-);
-
-const subcategorySchema2 = new Schema(
-  {
-    sub_category_name: {
-      type: String,
-      required: true,
-    },
-    slug: {
-      type: String,
-      required: true,
-    },
-    parent_category_id: {
-      type: Schema.Types.ObjectId,
-      ref: "Category",
-      required: true,
-    },
-  },
-  { timestamps: true }
-);
-
-const thirdCategorySchema = new Schema(
-  {
-    third_category_name: {
-      type: String,
-      required: true,
-    },
-    slug: {
-      type: String,
-      required: true,
-    },
-    parent_category_id: {
-      type: Schema.Types.ObjectId,
-      ref: "Category",
-      required: true,
-    },
-    sub_category_id: {
-      type: Schema.Types.ObjectId,
-      ref: "Subcategory",
-      required: true,
-    },
-  },
-  { timestamps: true }
-);
-
-
-
-
-
-
-export const MainCategory = model("maincategory", mainCategorySchema);
-export const Subcategory = model("Subcategory", subcategorySchema2);
-export const ThirdCategory = model("ThirdCategory", thirdCategorySchema);
-
-
-
+import { v4 as uuidv4 } from 'uuid';
 
 
 // Item Schema (3rd-level category)
 const itemSchema = new Schema({
+  id: { type: String, required: true, default : uuidv4 },
   item_name: { type: String, required: true },
-  slug: { type: String }
+  slug: { type: String },
 });
- 
+
 const subcategorySchema = new Schema({
+  id: { type: String, required: true, default : uuidv4 },
   subcategory_name: { type: String, required: true },
-  slug: { type: String},
-  items: [itemSchema]  
+  slug: { type: String },
+  items: [itemSchema],
 });
 
 // Category Schema (Main category)
 const categorySchema = new Schema({
   category_name: { type: String, required: true },
-  slug: { type: String},
-  subcategories: [subcategorySchema]  
-}); 
+  slug: { type: String },
+  subcategories: [subcategorySchema],
+});
 
-
-export const Category = model<CategoryDocument>('Category', categorySchema);
-
-
+export const Category = model<CategoryDocument>("Category", categorySchema);
 
 // TypeScript Interface for Category Document
 interface CategoryDocument extends Document {

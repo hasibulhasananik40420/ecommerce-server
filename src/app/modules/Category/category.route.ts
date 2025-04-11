@@ -10,6 +10,7 @@ router.get('/main-categories', CategoryControllers.getMainCategories);
 // Get all categories
 router.get('/categories', CategoryControllers.getCategories);
 router.get('/sub-categories/:category', CategoryControllers.getSubCategories);
+router.get('/thirt-categories', CategoryControllers.getThirtCategories);
 
 // Update an existing category
 router.put('/update-category', CategoryControllers.updateCategory);

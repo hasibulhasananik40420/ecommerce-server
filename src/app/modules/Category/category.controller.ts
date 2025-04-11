@@ -3,10 +3,7 @@ import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import { CategoryServices } from "./category.service";
 import {
-  TCategory,
-  TMainCategory,
-  TSubCategory2,
-  TThirdCategory,
+  TCategory
 } from "./category.interface";
 
 
@@ -36,6 +33,18 @@ const getMainCategories = catchAsync(async (req, res) => {
 // Get all categories (including nested subcategories and third categories)
 const getSubCategories = catchAsync(async (req, res) => {
   const result = await CategoryServices.getSubCategories(req?.params?.category as string);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Categories retrieved successfully.",
+    data: result,
+  });
+});
+
+// Get all categories (including nested subcategories and third categories)
+const getThirtCategories = catchAsync(async (req, res) => {
+  const result = await CategoryServices.getThirtCategories(req?.query as any);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -106,6 +115,7 @@ export const CategoryControllers = {
   getMainCategories,
   getCategories,
   getSubCategories,
+  getThirtCategories,
   updateCategory,
   deleteCategory,
   deleteSubCategory,

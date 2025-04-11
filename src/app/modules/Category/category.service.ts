@@ -1,16 +1,9 @@
 import {
   Category,
-  MainCategory,
-  Subcategory,
-  ThirdCategory,
 } from "./category.model";
 import { notFound, forbidden } from "../../utils/errorfunc";
 import {
-  TCategory,
-  TItem,
-  TMainCategory,
-  TSubCategory2,
-  TThirdCategory,
+  TCategory
 } from "./category.interface";
 import { Product } from "../Product/product.model";
 import { generateSlug } from "../../utils/generateSlug";
@@ -108,10 +101,43 @@ const getSubCategories = async (category_name: string) => {
 };
 
 
+// const getThirtCategories = async (query : any) => {
+  
+//    console.log(query)
+//     const result = await Category.findOne({ category_name : query?.category_name }).select('subcategories');
+
+//     return result ? result.subcategories : [];
+
+// };
+
+
+const getThirtCategories = async (query: any) => {
+  console.log(query);
+
+  // Querying the category by category_name and subcategory_name
+  const result = await Category.findOne({
+    category_name: query?.category_name,
+    'subcategories.subcategory_name': query?.subcategory_name,  // Matching the subcategory_name
+  }).select('subcategories');
+
+  // If a category with matching subcategory is found, return the subcategory data
+  if (result) {
+    // Filter the subcategories to return the specific one based on subcategory_name
+    const filteredSubcategory = result.subcategories.filter(
+      (sub) => sub.subcategory_name === query?.subcategory_name
+    );
+
+    return filteredSubcategory.length > 0 ? filteredSubcategory[0] : null;
+  }
+
+  return null; // Return null if no matching data found
+};
+
+
 
 // Update category name (ensure uniqueness)
 const updateCategory = async (category_id: string, newCategoryName: string) => {
-  const category = await MainCategory.findById(category_id);
+  const category = await Category.findById(category_id);
 
   if (!category) {
     throw notFound("MainCategory not found.");
@@ -121,7 +147,7 @@ const updateCategory = async (category_id: string, newCategoryName: string) => {
     throw forbidden("MainCategory not update same name.");
   }
   const slug = generateSlug(newCategoryName);
-  const existingCategory = await MainCategory.findOne({
+  const existingCategory = await Category.findOne({
     category_name: newCategoryName,
     slug,
   });
@@ -138,7 +164,7 @@ const updateCategory = async (category_id: string, newCategoryName: string) => {
 
 // Delete a category (if no product exists under it)
 const deleteCategory = async (category_id: string) => {
-  const category = await MainCategory.findById(category_id);
+  const category = await Category.findById(category_id);
 
   if (!category) {
     throw notFound("MainCategory not found.");
@@ -153,7 +179,7 @@ const deleteCategory = async (category_id: string) => {
   }
 
   // Delete the category
-  const result = await MainCategory.findByIdAndDelete(category_id);
+  const result = await Category.findByIdAndDelete(category_id);
   return result;
 };
 
@@ -166,7 +192,7 @@ const deleteSubCategory = async (category_id: string) => {
   }
 
   // Delete the category
-  const result = await Subcategory.findByIdAndDelete(category_id);
+  const result = await Category.findByIdAndDelete(category_id);
   return result;
 };
 
@@ -175,6 +201,7 @@ export const CategoryServices = {
   getMainCategories,
   getCategories,
   getSubCategories,
+  getThirtCategories,
   updateCategory,
   deleteCategory,
   deleteSubCategory,
