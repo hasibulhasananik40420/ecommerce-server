@@ -52,12 +52,13 @@ const getProductById = catchAsync(async (req, res) => {
 
 // Get all products
 const getAllProducts = catchAsync(async (req, res) => {
-  const result = await ProductServices.getAllProducts();
+  const result = await ProductServices.getAllProducts(req as any);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: 'Products retrieved successfully.',
-    data: result,
+    data: result.result,
+    meta: result.meta,
   });
 });
 

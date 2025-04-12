@@ -1,63 +1,63 @@
-import {
-  Category,
-} from "./category.model";
-import { notFound, forbidden } from "../../utils/errorfunc";
-import {
-  TCategory
-} from "./category.interface";
+import { Category } from "./category.model";
+import { notFound, forbidden, serverError } from "../../utils/errorfunc";
+import { TCategory } from "./category.interface";
 import { Product } from "../Product/product.model";
 import { generateSlug } from "../../utils/generateSlug";
+// import { v4 as uuidv4 } from "uuid";
+import { sendImageToCloudinary } from "../../utils/sendImageToCloudinary";
 
-const createCategory = async (payload: TCategory) => {
+const createCategory = async (payload: TCategory, file: any) => {
   const { category_name, subcategories } = payload;
 
+  let existingCategory = await Category.findOne({ category_name });
   const slug = generateSlug(category_name);
 
-  // Check if the category already exists
-  let existingCategory = await Category.findOne({ category_name });
+  let profile = existingCategory?.icon || "";
+  if (file) {
+    try {
+      const result = await sendImageToCloudinary(file.filename, file.path);
+      profile = result.url as string;
+    } catch (error) {
+      throw serverError("Failed to upload the image.");
+    }
+  }
+
+  console.log(profile);
 
   if (!existingCategory) {
-    // If the category doesn't exist, create a new one
     existingCategory = new Category({
+      icon: profile,
       category_name,
       slug,
-      subcategories: subcategories || [], // If no subcategories, set as an empty array
+      subcategories: subcategories || [],
     });
   } else {
-    // If the category exists and subcategories are provided, proceed to add subcategories and items
     if (subcategories) {
-      // Process each subcategory
       for (const subcategory of subcategories) {
         const { subcategory_name, items } = subcategory;
         const subcategorySlug = generateSlug(subcategory_name);
-
-        // Check if subcategory already exists under the existing category
         let existingSubcategory = existingCategory.subcategories.find(
           (sub) => sub.subcategory_name === subcategory_name
         );
 
         if (!existingSubcategory) {
-          // If subcategory doesn't exist, create and add it (even if there are no items)
           existingSubcategory = {
             subcategory_name,
             slug: subcategorySlug,
-            items: items || [], // If no items, initialize it as an empty array
+            items: items || [],
           };
           existingCategory.subcategories.push(existingSubcategory);
         }
 
-        // If items are provided, process each item (3rd-level category) under the subcategory
         if (items && items.length > 0) {
           for (const item of items) {
             const { item_name } = item;
             const itemSlug = generateSlug(item_name);
 
-            // Check if the item already exists within the subcategory
             const existingItem = existingSubcategory.items.find(
               (i) => i.item_name === item_name
             );
             if (!existingItem) {
-              // Add the item to the subcategory's items list if it doesn't exist
               existingSubcategory.items.push({ item_name, slug: itemSlug });
             }
           }
@@ -72,7 +72,6 @@ const createCategory = async (payload: TCategory) => {
   return result;
 };
 
-// Get all categories, subcategories, and third-level categories
 const getCategories = async () => {
   const reslut = await Category.find().lean();
   return reslut;
@@ -81,38 +80,32 @@ const getCategories = async () => {
 // Get all categories, subcategories, and third-level categories (items)
 const getMainCategories = async () => {
   try {
-    const result = await Category.find().select('category_name');
+    const result = await Category.find().select("category_name");
 
     console.log(result);
     return result;
   } catch (error) {
-    console.error('Error fetching categories:', error);
-    throw new Error('Could not retrieve categories');
+    console.error("Error fetching categories:", error);
+    throw new Error("Could not retrieve categories");
   }
 };
 
 // Get subcategories for a given category by name (only return the subcategory names)
 const getSubCategories = async (category_name: string) => {
-  
-    const result = await Category.findOne({ category_name }).select('subcategories.subcategory_name');
+  const result = await Category.findOne({ category_name }).select(
+    "subcategories.subcategory_name"
+  );
 
-    return result ? result.subcategories : [];
+  return result ? result.subcategories : [];
 };
 
-
-
 const getThirtCategories = async (query: any) => {
-  console.log(query);
-
-  // Querying the category by category_name and subcategory_name
   const result = await Category.findOne({
     category_name: query?.category_name,
-    'subcategories.subcategory_name': query?.subcategory_name,  // Matching the subcategory_name
-  }).select('subcategories');
+    "subcategories.subcategory_name": query?.subcategory_name,
+  }).select("subcategories");
 
-  // If a category with matching subcategory is found, return the subcategory data
   if (result) {
-    // Filter the subcategories to return the specific one based on subcategory_name
     const filteredSubcategory = result.subcategories.filter(
       (sub) => sub.subcategory_name === query?.subcategory_name
     );
@@ -120,10 +113,8 @@ const getThirtCategories = async (query: any) => {
     return filteredSubcategory.length > 0 ? filteredSubcategory[0] : null;
   }
 
-  return null; // Return null if no matching data found
+  return null;
 };
-
-
 
 // Update category name (ensure uniqueness)
 const updateCategory = async (category_id: string, newCategoryName: string) => {

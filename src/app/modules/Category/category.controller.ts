@@ -9,7 +9,7 @@ import {
 
 // Create a new category (main, subcategory, or third-level)
 const createCategory = catchAsync(async (req, res) => {
-  const result = await CategoryServices.createCategory(req.body as TCategory);
+  const result = await CategoryServices.createCategory(req.body as TCategory, req.file as any);
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
     success: true,
