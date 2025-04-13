@@ -4,6 +4,7 @@ import { notificationRoutes } from '../modules/Notifications/notification.route'
 import { userRoutes } from '../modules/User/user.route';
 import { categoryRoutes } from '../modules/Category/category.route';
 import { productRoutes } from '../modules/Product/product.routes';
+import { reviewRoutes } from '../modules/Review/review.routes';
 
 const router = Router();
 
@@ -27,6 +28,10 @@ const moduleRoutes = [
     route: productRoutes,
   },
   
+  {
+    path: '/review',
+    route: reviewRoutes,
+  },
   {
     path: '/notification',
     route: notificationRoutes,

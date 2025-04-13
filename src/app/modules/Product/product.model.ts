@@ -2,45 +2,81 @@ import { Schema, model } from "mongoose";
 
 const productSchema = new Schema(
   {
-    product_name: {
+    name: {
       type: String,
-      required: true,
+      required: [true, 'Product name is required'],
+    },
+    image: {
+      type: String,
+      required: [true, 'Main image URL is required'],
+    },
+    images: {
+      type: [String],
+      required: [true, 'Additional images are required'],
     },
     description: {
       type: String,
-      required: true,
+      required: [true, 'Product description is required'],
     },
-    min_price: { 
-      type: Number
-    },
-    max_price: { 
-      type: Number
-    },
-    regular_price: {
+    min_price: {
       type: Number,
-      required: true,
+    },
+    max_price: {
+      type: Number,
+    },
+    price: {
+      type: Number,
+      required: [true, 'Regular price is required'],
     },
     sale_price: {
       type: Number,
       default: null,
     },
-    stock_quantity: {
-      type: Number,
-      required: true,
+    brand: {
+      type: String,
+      required: [true, 'Brand name is required'],
     },
-    stock_status: {
+    sku: {
+      type: String,
+      required: [true, 'SKU is required'],
+    },
+    currency: {
+      type: String,
+      required: [true, 'Currency is required'],
+    },
+    materials: {
+      type: [String],
+      required: [true, 'At least one material must be specified'],
+    },
+    stock: {
+      type: Number,
+      required: [true, 'Stock quantity is required'],
+    },
+    availability: {
       type: String,
       enum: ["In Stock", "Out of Stock", "Preorder"],
       default: "In Stock",
     },
     attributes: [
       {
-        attribute_name: String,
+        attribute_name: {
+          type: String,
+          required: [true, 'Attribute name is required'],
+        },
         values: [
           {
-            value: String,  // The specific attribute value (e.g., "Red", "XL")
-            price: { type: Number, required: true },  // Price of this attribute value
-            quantity: { type: Number, required: true },  // Quantity of this attribute value
+            value: {
+              type: String,
+              required: [true, 'Attribute value is required'],
+            },
+            price: {
+              type: Number,
+              required: [true, 'Attribute price is required'],
+            },
+            quantity: {
+              type: Number,
+              required: [true, 'Attribute quantity is required'],
+            },
           },
         ],
       },
@@ -56,14 +92,20 @@ const productSchema = new Schema(
     },
     category: {
       type: String,
+      required: [true, 'Category is required'],
     },
     subcategory: {
       type: String,
+      required: [true, 'Subcategory is required'],
     },
     item: {
       type: String,
+      required: [true, 'Item name is required'],
     },
-    tags: [String],
+    tags: {
+      type: [String],
+      default: [],
+    },
     status: {
       type: String,
       enum: ["Draft", "Published"],
@@ -77,7 +119,6 @@ const productSchema = new Schema(
   { timestamps: true }
 );
 
-// Pre-save middleware to calculate min_price, max_price, and filter attributes with 0 quantity
 productSchema.pre("save", function (next) {
   const product = this as any;
 
@@ -85,16 +126,13 @@ productSchema.pre("save", function (next) {
   let maxPrice = -Infinity;
 
   product.attributes.forEach((attribute: any) => {
-    attribute.values = attribute.values.filter((value: any) => value.quantity > 0); // Filter out attributes with 0 quantity
-
-    // Loop through each valid attribute value to calculate min_price and max_price
+    attribute.values = attribute.values.filter((value: any) => value.quantity > 0);
     attribute.values.forEach((value: any) => {
       if (value.price < minPrice) minPrice = value.price;
       if (value.price > maxPrice) maxPrice = value.price;
     });
   });
 
-  // Assign the calculated min_price and max_price to the product
   product.min_price = minPrice === Infinity ? 0 : minPrice;
   product.max_price = maxPrice === -Infinity ? 0 : maxPrice;
 
