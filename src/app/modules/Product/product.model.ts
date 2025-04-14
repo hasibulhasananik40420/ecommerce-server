@@ -4,19 +4,31 @@ const productSchema = new Schema(
   {
     name: {
       type: String,
-      required: [true, 'Product name is required'],
+      required: [true, "Product name is required"],
+    },
+    rating: {
+      type: Number,
+      default: 0,
+    },
+    reviewsCount: {
+      type: Number,
+      default: 0,
+    },
+    product_type: {
+      type: String,
+      required: [true, "Product type is required"],
     },
     image: {
       type: String,
-      required: [true, 'Main image URL is required'],
+      required: [true, "Main image URL is required"],
     },
     images: {
       type: [String],
-      required: [true, 'Additional images are required'],
+      required: [true, "Additional images are required"],
     },
     description: {
       type: String,
-      required: [true, 'Product description is required'],
+      required: [true, "Product description is required"],
     },
     min_price: {
       type: Number,
@@ -26,7 +38,7 @@ const productSchema = new Schema(
     },
     price: {
       type: Number,
-      required: [true, 'Regular price is required'],
+      required: [true, "Regular price is required"],
     },
     sale_price: {
       type: Number,
@@ -34,23 +46,23 @@ const productSchema = new Schema(
     },
     brand: {
       type: String,
-      required: [true, 'Brand name is required'],
+      required: [true, "Brand name is required"],
     },
     sku: {
       type: String,
-      required: [true, 'SKU is required'],
+      required: [true, "SKU is required"],
     },
     currency: {
       type: String,
-      required: [true, 'Currency is required'],
+      required: [true, "Currency is required"],
     },
     materials: {
       type: [String],
-      required: [true, 'At least one material must be specified'],
+      required: [true, "At least one material must be specified"],
     },
     stock: {
       type: Number,
-      required: [true, 'Stock quantity is required'],
+      required: [true, "Stock quantity is required"],
     },
     availability: {
       type: String,
@@ -61,21 +73,21 @@ const productSchema = new Schema(
       {
         attribute_name: {
           type: String,
-          required: [true, 'Attribute name is required'],
+          required: [true, "Attribute name is required"],
         },
         values: [
           {
             value: {
               type: String,
-              required: [true, 'Attribute value is required'],
+              required: [true, "Attribute value is required"],
             },
             price: {
               type: Number,
-              required: [true, 'Attribute price is required'],
+              required: [true, "Attribute price is required"],
             },
             quantity: {
               type: Number,
-              required: [true, 'Attribute quantity is required'],
+              required: [true, "Attribute quantity is required"],
             },
           },
         ],
@@ -92,15 +104,15 @@ const productSchema = new Schema(
     },
     category: {
       type: String,
-      required: [true, 'Category is required'],
+      required: [true, "Category is required"],
     },
     subcategory: {
       type: String,
-      required: [true, 'Subcategory is required'],
+      required: [true, "Subcategory is required"],
     },
     item: {
       type: String,
-      required: [true, 'Item name is required'],
+      required: [true, "Item name is required"],
     },
     tags: {
       type: [String],
@@ -126,7 +138,9 @@ productSchema.pre("save", function (next) {
   let maxPrice = -Infinity;
 
   product.attributes.forEach((attribute: any) => {
-    attribute.values = attribute.values.filter((value: any) => value.quantity > 0);
+    attribute.values = attribute.values.filter(
+      (value: any) => value.quantity > 0
+    );
     attribute.values.forEach((value: any) => {
       if (value.price < minPrice) minPrice = value.price;
       if (value.price > maxPrice) maxPrice = value.price;

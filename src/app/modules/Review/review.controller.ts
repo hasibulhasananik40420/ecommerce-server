@@ -4,36 +4,28 @@ import sendResponse from "../../utils/sendResponse";
 import { ReviewServices } from "./review.service";
 
 import httpStatus from "http-status";
+ 
 
-// Create a new review
+// Create a new product
 const createReview = catchAsync(async (req, res) => {
-  const userId = req?.user?.id;  // Assumes you're using middleware to set the current user
-  const { productId, rating, images, description } = req.body;
-  const newReview = await ReviewServices.createReview({
-    productId,
-    user: userId,
-    rating,
-    images,
-    description,
-    createdAt: new Date(),
-  });
+  const result = await ReviewServices.createReview(req);
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
     success: true,
-    message: "Review created successfully.",
-    data: newReview,
+    message: 'Product created successfully.',
+    data: result,
   });
 });
 
 // Get all reviews for a product
 const getReviewsByProduct = catchAsync(async (req, res) => {
-  const { productId } = req.params;
-  const reviews = await ReviewServices.getReviewsByProduct(productId);
+  const reviews = await ReviewServices.getReviewsByProduct(req);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: "Reviews retrieved successfully.",
-    data: reviews,
+    data: reviews?.result,
+    meta: reviews?.meta,
   });
 });
 

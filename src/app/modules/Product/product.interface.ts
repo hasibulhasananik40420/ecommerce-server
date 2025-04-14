@@ -1,6 +1,9 @@
 export type TProduct = {
   name: string;
+  product_type: string;
   image: string;
+  rating: number;
+  reviewsCount: number;
   images: string[];
   description: string;
   min_price: number;
@@ -34,5 +37,3 @@ export type TProduct = {
   status: "Draft" | "Published";
   publish_date?: Date;
 };
-
-

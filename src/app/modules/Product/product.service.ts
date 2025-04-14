@@ -4,54 +4,9 @@ import { TProduct } from "./product.interface";
 import QueryBuilder from "../../builder/QueryBuilder";
 import { sendImageToCloudinary } from "../../utils/sendImageToCloudinary";
 import compressImage from "../../utils/compressImage";
+import { Review } from "../Review/review.model";
 
 // Create a new product
-
-
-
-
-// const createProduct = async (req: any) => {
-//   const payload = req.body as TProduct;
-//   const filesMap = req.files as { [fieldname: string]: Express.Multer.File[] };
-
-//   // Primary image (single)
-//   let profile = "";
-//   if (filesMap?.file && filesMap.file.length > 0) {
-//     try {
-//       const result = await sendImageToCloudinary(
-//         filesMap.file[0].filename,
-//         filesMap.file[0].path
-//       );
-//       profile = result.url as string;
-//       console.log(profile, "Uploaded primary image");
-//     } catch (error) {
-//       throw serverError("Failed to upload the primary image.");
-//     }
-//   }
-
-//   payload.image = profile;
-
-//   // Gallery images (multiple - parallel upload using Promise.all)
-//   if (filesMap?.files && filesMap.files.length > 0) {
-//     try {
-//       const uploadPromises = filesMap.files.map((file) =>
-//         sendImageToCloudinary(file.filename, file.path)
-//       );
-
-//       const uploadResults = await Promise.all(uploadPromises);
-
-//       const imageUrls = uploadResults.map((res) => res.url as string);
-//       payload.images = imageUrls;
-//     } catch (err) {
-//       throw serverError("One or more gallery images failed to upload.");
-//     }
-//   } else {
-//     payload.images = [];
-//   }
-
-//   const result = await Product.create(payload);
-//   return result;
-// };
 
 const createProduct = async (req: any) => {
   const payload = req.body as TProduct;
@@ -61,9 +16,9 @@ const createProduct = async (req: any) => {
   let profile = "";
   if (filesMap?.file && filesMap.file.length > 0) {
     try {
-      const compressedPath = 'uploads/compressed_' + filesMap.file[0].filename;
+      const compressedPath = "uploads/compressed_" + filesMap.file[0].filename;
       await compressImage(filesMap.file[0].path, compressedPath);
-      
+
       const result = await sendImageToCloudinary(
         filesMap.file[0].filename,
         compressedPath
@@ -81,7 +36,7 @@ const createProduct = async (req: any) => {
   if (filesMap?.files && filesMap.files.length > 0) {
     try {
       const uploadPromises = filesMap.files.map(async (file) => {
-        const compressedPath = 'uploads/compressed_' + file.filename; // Define the compressed path
+        const compressedPath = "uploads/compressed_" + file.filename; // Define the compressed path
         await compressImage(file.path, compressedPath); // Compress image
         return sendImageToCloudinary(file.filename, compressedPath);
       });
@@ -100,7 +55,6 @@ const createProduct = async (req: any) => {
   const result = await Product.create(payload);
   return result;
 };
-
 
 // Get all products
 const getAllProducts = async (req: any) => {
@@ -153,6 +107,9 @@ const getProductById = async (product_id: string) => {
   if (!product) {
     throw notFound("Product not found.");
   }
+
+  const reviews = await Review.find({ productId: product_id });
+  console.log(reviews);
   return product;
 };
 

@@ -1,13 +1,22 @@
 import express from "express";
 import { ReviewControllers } from "./review.controller";
+import { upload } from "../../utils/sendImageToCloudinary";
 
 const router = express.Router();
 
 // Create a new review
-router.post("/create-review", ReviewControllers.createReview);
+router.post(
+  "/create-review",
+  upload.fields([{ name: "files", maxCount: 5 }]),
+  (req, res, next) => {
+    req.body = JSON.parse(req.body.data);
+    next();
+  },
+  ReviewControllers.createReview
+);
 
 // Get all reviews for a product
-router.get("/reviews/:productId", ReviewControllers.getReviewsByProduct);
+router.get("/reviews", ReviewControllers.getReviewsByProduct);
 
 // Get a single review by ID
 router.get("/review/:reviewId", ReviewControllers.getReviewById);
