@@ -56,8 +56,6 @@ const createProduct = async (req: any) => {
   return result;
 };
 
-
-
 // Get all products
 const getAllProducts = async (req: any) => {
   const queryBuilder = new QueryBuilder(
@@ -74,7 +72,12 @@ const getAllProducts = async (req: any) => {
     .paginate();
 
   const result = await queryBuilder.modelQuery;
+
   const meta = await queryBuilder.countTotal();
+
+  if (!result) {
+    throw notFound("Product not fount");
+  }
   return { result, meta };
 };
 
@@ -129,7 +132,7 @@ const getProductById = async (req: any) => {
     .sort()
     .paginate()
     // .populate('profileId', 'firstName lastName image')
-    .populate('user')
+    .populate("user");
 
   const reviews = await queryBuilder.modelQuery;
   const meta = await queryBuilder.countTotal();

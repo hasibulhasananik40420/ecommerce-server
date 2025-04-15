@@ -268,6 +268,7 @@ const getSubCategories = async (slug: string) => {
   return result ? result.subcategories : [];
 };
 
+
 const getThirtCategories = async (query: any) => {
   const result = await Category.findOne({
     category_name: query?.category_name,
@@ -284,6 +285,8 @@ const getThirtCategories = async (query: any) => {
 
   return null;
 };
+
+
 
 // Update category name (ensure uniqueness)
 const updateCategory = async (category_id: string, newCategoryName: string) => {
