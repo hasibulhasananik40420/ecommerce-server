@@ -68,54 +68,13 @@ const createCategory = async (payload: TCategory, file: any) => {
   const result = await existingCategory.save();
 
   return result;
-}; 
-
-
-// const getCategories = async () => {
-//   const result = await Category.aggregate([
-//     {
-//       $match: {
-//         subcategories: { $exists: true }, 
-//       },
-//     },
-//     {
-//       $project: {
-//         category_name: 1,
-//         slug: 1,
-//         icon: 1,
-//         subcategories: 1,  
-//       },
-//     },
-//     {
-//       $unwind: {
-//         path: "$subcategories",
-//         preserveNullAndEmptyArrays: true,  
-//       },
-//     },
-//     {
-//       $match: {
-//         "subcategories.items": { $exists: true },  
-//       },
-//     },
-//     {
-//       $project: {
-//         category_name: 1,
-//         slug: 1,
-//         icon: 1,
-//         "subcategories.subcategory_name": 1,
-//         "subcategories.items": 1, 
-//       },
-//     },
-//   ]);
+};
  
-//   return result;
-// };
-
 const getCategories = async () => {
   const result = await Category.aggregate([
     {
       $match: {
-        subcategories: { $exists: true }, // Ensure subcategories field exists (even if empty)
+        subcategories: { $exists: true },
       },
     },
     {
@@ -123,54 +82,69 @@ const getCategories = async () => {
         category_name: 1,
         slug: 1,
         icon: 1,
-        subcategories: 1, // Keep the subcategories field for now
+        subcategories: 1,
       },
     },
-    {
-      $unwind: {
-        path: "$subcategories",
-        preserveNullAndEmptyArrays: true, // Keep categories even if they have no subcategories
-      },
-    },
-    {
-      $match: {
-        "subcategories.items": { $exists: true }, // Ensure items field exists
-      },
-    },
-    {
-      $unwind: {
-        path: "$subcategories.items", // Unwind to work with individual items
-        preserveNullAndEmptyArrays: true, // Keep subcategories even if they have no items
-      },
-    },
+    { $unwind: { path: "$subcategories", preserveNullAndEmptyArrays: false } },
+    { $unwind: { path: "$subcategories.items", preserveNullAndEmptyArrays: false } },
     {
       $lookup: {
-        from: "products", // Join with the products collection
-        localField: "subcategories.items.item_name", // Match item_name in subcategory with product's item
-        foreignField: "item", // Assume your product model has an `item` field
+        from: "products",
+        localField: "subcategories.items.item_name",
+        foreignField: "item",
         as: "product_details",
       },
     },
     {
       $match: {
-        "product_details": { $ne: [] }, // Only include subcategories that have products
+        "product_details.0": { $exists: true }, // keep only items with products
       },
     },
     {
       $group: {
-        _id: "$_id",
+        _id: {
+          category_id: "$_id",
+          subcategory_name: "$subcategories.subcategory_name",
+        },
         category_name: { $first: "$category_name" },
         slug: { $first: "$slug" },
         icon: { $first: "$icon" },
-        subcategories: { $push: "$subcategories" }, // Rebuild the subcategories array
+        subcategory_slug: { $first: "$subcategories.slug" },
+        items: { $push: "$subcategories.items" },
+      },
+    },
+    {
+      $match: {
+        items: { $ne: [] },
+      },
+    },
+    {
+      $group: {
+        _id: "$_id.category_id",
+        category_name: { $first: "$category_name" },
+        slug: { $first: "$slug" },
+        icon: { $first: "$icon" },
+        subcategories: {
+          $push: {
+            subcategory_name: "$_id.subcategory_name",
+            slug: "$subcategory_slug",
+            items: "$items",
+          },
+        },
+      },
+    },
+    {
+      $match: {
+        subcategories: { $ne: [] },
       },
     },
     {
       $project: {
+        _id: 0,
         category_name: 1,
         slug: 1,
         icon: 1,
-        subcategories: 1, // Keep full subcategory details
+        subcategories: 1,
       },
     },
   ]);
@@ -179,6 +153,99 @@ const getCategories = async () => {
 };
 
 
+// const getCategories = async () => {
+//   const result = await Category.aggregate([
+//     {
+//       $match: {
+//         subcategories: { $exists: true },
+//       },
+//     },
+//     {
+//       $project: {
+//         category_name: 1,
+//         slug: 1,
+//         icon: 1,
+//         subcategories: 1,
+//       },
+//     },
+//     { $unwind: { path: "$subcategories", preserveNullAndEmptyArrays: false } },
+//     { $unwind: { path: "$subcategories.items", preserveNullAndEmptyArrays: false } },
+//     {
+//       $lookup: {
+//         from: "products",
+//         localField: "subcategories.items.item_name",
+//         foreignField: "item",
+//         as: "product_details",
+//       },
+//     },
+//     {
+//       $match: {
+//         "product_details.0": { $exists: true }, // keep items with at least one product
+//       },
+//     },
+//     {
+//       $addFields: {
+//         "subcategories.items.product_details": "$product_details",
+//       },
+//     },
+//     {
+//       $group: {
+//         _id: {
+//           category_id: "$_id",
+//           subcategory_name: "$subcategories.subcategory_name",
+//         },
+//         category_name: { $first: "$category_name" },
+//         slug: { $first: "$slug" },
+//         icon: { $first: "$icon" },
+//         subcategory_slug: { $first: "$subcategories.slug" },
+//         items: { $push: "$subcategories.items" },
+//       },
+//     },
+//     {
+//       $match: {
+//         items: { $ne: [] }, // keep subcategories with items
+//       },
+//     },
+//     {
+//       $group: {
+//         _id: "$_id.category_id",
+//         category_name: { $first: "$category_name" },
+//         slug: { $first: "$slug" },
+//         icon: { $first: "$icon" },
+//         subcategories: {
+//           $push: {
+//             subcategory_name: "$_id.subcategory_name",
+//             slug: "$subcategory_slug",
+//             items: "$items",
+//           },
+//         },
+//       },
+//     },
+//     {
+//       $match: {
+//         subcategories: { $ne: [] }, // keep categories with subcategories
+//       },
+//     },
+//     {
+//       $project: {
+//         _id: 0,
+//         category_name: 1,
+//         slug: 1,
+//         icon: 1,
+//         subcategories: 1,
+//       },
+//     },
+//   ]);
+
+//   return result;
+// };
+
+
+
+// const getCategories = async () => {
+//   const result = await Category.find();
+//   return result;
+// };
 
 const getMainCategories = async () => {
   try {
@@ -194,7 +261,7 @@ const getMainCategories = async () => {
 
 // Get subcategories for a given category by name (only return the subcategory names)
 const getSubCategories = async (slug: string) => {
-  const result = await Category.findOne({slug }).select(
+  const result = await Category.findOne({ slug }).select(
     "subcategories.subcategory_name subcategories.slug"
   );
 
