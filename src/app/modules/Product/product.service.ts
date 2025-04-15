@@ -56,6 +56,8 @@ const createProduct = async (req: any) => {
   return result;
 };
 
+
+
 // Get all products
 const getAllProducts = async (req: any) => {
   const queryBuilder = new QueryBuilder(
@@ -102,15 +104,38 @@ const deleteProduct = async (product_id: string) => {
 };
 
 // Get a product by its ID
-const getProductById = async (product_id: string) => {
-  const product = await Product.findById(product_id);
+const getProductById = async (req: any) => {
+  // const reviews = await Review.find({ productId: product_id });
+  // console.log(reviews);
+  // return product;
+
+  const productId = req.query.productId;
+  const product = await Product.findById(productId);
   if (!product) {
     throw notFound("Product not found.");
   }
 
-  const reviews = await Review.find({ productId: product_id });
-  console.log(reviews);
-  return product;
+  // const reviews = await Review.find({ productId });
+  const queryBuilder = new QueryBuilder(
+    Review.find({ productId }),
+    req.query as Record<string, unknown>
+  );
+  queryBuilder
+    .search([])
+    .filter()
+    .dateFilter("createdAt")
+    .dateFilterOne("createdAt")
+    .dateFilterTow("deliveryDate")
+    .sort()
+    .paginate()
+    // .populate('profileId', 'firstName lastName image')
+    .populate('user')
+
+  const reviews = await queryBuilder.modelQuery;
+  const meta = await queryBuilder.countTotal();
+
+  const result = { product, reviews };
+  return { result, meta };
 };
 
 export const ProductServices = {

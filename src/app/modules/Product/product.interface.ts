@@ -21,6 +21,7 @@ export type TProduct = {
     values: {
       value: string;
       price: number;
+      image?: string;
       quantity: number;
     }[];
   }[];

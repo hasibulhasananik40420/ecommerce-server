@@ -1,7 +1,7 @@
-import httpStatus from 'http-status';
-import catchAsync from '../../utils/catchAsync';
-import sendResponse from '../../utils/sendResponse';
-import { ProductServices } from './product.service';
+import httpStatus from "http-status";
+import catchAsync from "../../utils/catchAsync";
+import sendResponse from "../../utils/sendResponse";
+import { ProductServices } from "./product.service";
 
 // Create a new product
 const createProduct = catchAsync(async (req, res) => {
@@ -9,7 +9,7 @@ const createProduct = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
     success: true,
-    message: 'Product created successfully.',
+    message: "Product created successfully.",
     data: result,
   });
 });
@@ -21,7 +21,7 @@ const updateProduct = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Product updated successfully.',
+    message: "Product updated successfully.",
     data: result,
   });
 });
@@ -33,20 +33,20 @@ const deleteProduct = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Product deleted successfully.',
+    message: "Product deleted successfully.",
     data: result,
   });
 });
 
 // Get a single product
 const getProductById = catchAsync(async (req, res) => {
-  const { product_id } = req.params;
-  const result = await ProductServices.getProductById(product_id);
+  const result = await ProductServices.getProductById(req as any);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Product retrieved successfully.',
-    data: result,
+    message: "Product retrieved successfully.",
+    data: result.result,
+    meta: result.meta,
   });
 });
 
@@ -56,7 +56,7 @@ const getAllProducts = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Products retrieved successfully.',
+    message: "Products retrieved successfully.",
     data: result.result,
     meta: result.meta,
   });

@@ -10,7 +10,7 @@ const reviewSchema = new Schema(
     },
     user: {
       type: Schema.Types.ObjectId,
-      ref: "User", // Assumed you have a User model
+      ref: "Users", // Assumed you have a User model
       required: [true, "User ID is required"],
     },
     rating: {

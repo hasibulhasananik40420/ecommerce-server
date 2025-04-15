@@ -2,14 +2,15 @@ import httpStatus from "http-status";
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import { CategoryServices } from "./category.service";
-import {
-  TCategory
-} from "./category.interface";
-
+import { TCategory } from "./category.interface";
 
 // Create a new category (main, subcategory, or third-level)
 const createCategory = catchAsync(async (req, res) => {
-  const result = await CategoryServices.createCategory(req.body as TCategory, req.file as any);
+  console.log(req?.body);
+  const result = await CategoryServices.createCategory(
+    req.body as TCategory,
+    req.file as any
+  );
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
     success: true,
@@ -29,10 +30,11 @@ const getMainCategories = catchAsync(async (req, res) => {
   });
 });
 
-
 // Get all categories (including nested subcategories and third categories)
 const getSubCategories = catchAsync(async (req, res) => {
-  const result = await CategoryServices.getSubCategories(req?.params?.category as string);
+  const result = await CategoryServices.getSubCategories(
+    req?.params?.category as string
+  );
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

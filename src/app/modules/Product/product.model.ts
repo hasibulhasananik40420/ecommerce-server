@@ -81,6 +81,9 @@ const productSchema = new Schema(
               type: String,
               required: [true, "Attribute value is required"],
             },
+            image: {
+              type: String,
+            },
             price: {
               type: Number,
               required: [true, "Attribute price is required"],

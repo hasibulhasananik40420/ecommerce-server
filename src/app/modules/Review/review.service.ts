@@ -57,7 +57,7 @@ const createReview = async (req: any) => {
 // Get all reviews for a product
 const getReviewsByProduct = async (req: any) => {
   const productId = req.query.productId
-  console.log(productId)
+  
   // const reviews = await Review.find({ productId });
   const queryBuilder = new QueryBuilder(
     Review.find({ productId }),
