@@ -81,6 +81,38 @@ const getAllProducts = async (req: any) => {
   return { result, meta };
 };
 
+// const getAllSearch = async () => {
+//   const result = await Product.find().select('tags');
+
+//   if (!result) {
+//     throw notFound("Product not found");
+//   }
+
+//   // Flatten and eliminate duplicates
+//   const allTags = [...new Set(result.flatMap(product => product.tags))];
+
+//   return {tags : allTags};
+// };
+
+const getAllSearch = async (searchQuery: string) => {
+  
+  const result = await Product.find().select("tags");
+
+  if (!result) {
+    throw notFound("Product not found");
+  }
+
+  // Flatten and eliminate duplicates
+  const allTags = [...new Set(result.flatMap((product) => product.tags))];
+
+  // Filter tags based on the search query (case-insensitive)
+  const filteredTags = allTags.filter((tag) =>
+    tag.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  return { tags: filteredTags };
+};
+
 // Update an existing product
 const updateProduct = async (
   product_id: string,
@@ -147,4 +179,5 @@ export const ProductServices = {
   deleteProduct,
   getProductById,
   getAllProducts,
+  getAllSearch,
 };

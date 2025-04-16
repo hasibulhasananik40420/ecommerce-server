@@ -22,6 +22,9 @@ router.post(
 // Update an existing product
 router.put("/update-product/:product_id", ProductControllers.updateProduct);
 
+// Update an existing product
+router.get("/search-tags", ProductControllers.getAllSearch);
+
 // Delete a product
 router.delete("/delete-product/:product_id", ProductControllers.deleteProduct);
 

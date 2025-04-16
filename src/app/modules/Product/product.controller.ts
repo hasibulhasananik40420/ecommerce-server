@@ -62,10 +62,23 @@ const getAllProducts = catchAsync(async (req, res) => {
   });
 });
 
+// Get all products
+const getAllSearch = catchAsync(async (req, res) => {
+  const searchQuery = req?.query?.searchQuery || ''
+  const result = await ProductServices.getAllSearch(searchQuery as string);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Products retrieved successfully.",
+    data: result,
+  });
+});
+
 export const ProductControllers = {
   createProduct,
   updateProduct,
   deleteProduct,
   getProductById,
   getAllProducts,
+  getAllSearch
 };
