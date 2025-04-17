@@ -70,89 +70,6 @@ const createCategory = async (payload: TCategory, file: any) => {
   return result;
 };
  
-const getCategories = async () => {
-  const result = await Category.aggregate([
-    {
-      $match: {
-        subcategories: { $exists: true },
-      },
-    },
-    {
-      $project: {
-        category_name: 1,
-        slug: 1,
-        icon: 1,
-        subcategories: 1,
-      },
-    },
-    { $unwind: { path: "$subcategories", preserveNullAndEmptyArrays: false } },
-    { $unwind: { path: "$subcategories.items", preserveNullAndEmptyArrays: false } },
-    {
-      $lookup: {
-        from: "products",
-        localField: "subcategories.items.item_name",
-        foreignField: "item",
-        as: "product_details",
-      },
-    },
-    {
-      $match: {
-        "product_details.0": { $exists: true }, // keep only items with products
-      },
-    },
-    {
-      $group: {
-        _id: {
-          category_id: "$_id",
-          subcategory_name: "$subcategories.subcategory_name",
-        },
-        category_name: { $first: "$category_name" },
-        slug: { $first: "$slug" },
-        icon: { $first: "$icon" },
-        subcategory_slug: { $first: "$subcategories.slug" },
-        items: { $push: "$subcategories.items" },
-      },
-    },
-    {
-      $match: {
-        items: { $ne: [] },
-      },
-    },
-    {
-      $group: {
-        _id: "$_id.category_id",
-        category_name: { $first: "$category_name" },
-        slug: { $first: "$slug" },
-        icon: { $first: "$icon" },
-        subcategories: {
-          $push: {
-            subcategory_name: "$_id.subcategory_name",
-            slug: "$subcategory_slug",
-            items: "$items",
-          },
-        },
-      },
-    },
-    {
-      $match: {
-        subcategories: { $ne: [] },
-      },
-    },
-    {
-      $project: {
-        _id: 0,
-        category_name: 1,
-        slug: 1,
-        icon: 1,
-        subcategories: 1,
-      },
-    },
-  ]);
-
-  return result;
-};
-
-
 // const getCategories = async () => {
 //   const result = await Category.aggregate([
 //     {
@@ -180,12 +97,7 @@ const getCategories = async () => {
 //     },
 //     {
 //       $match: {
-//         "product_details.0": { $exists: true }, // keep items with at least one product
-//       },
-//     },
-//     {
-//       $addFields: {
-//         "subcategories.items.product_details": "$product_details",
+//         "product_details.0": { $exists: true }, // keep only items with products
 //       },
 //     },
 //     {
@@ -203,7 +115,7 @@ const getCategories = async () => {
 //     },
 //     {
 //       $match: {
-//         items: { $ne: [] }, // keep subcategories with items
+//         items: { $ne: [] },
 //       },
 //     },
 //     {
@@ -223,7 +135,7 @@ const getCategories = async () => {
 //     },
 //     {
 //       $match: {
-//         subcategories: { $ne: [] }, // keep categories with subcategories
+//         subcategories: { $ne: [] },
 //       },
 //     },
 //     {
@@ -241,11 +153,166 @@ const getCategories = async () => {
 // };
 
 
+const getCategories = async () => {
+  const result = await Category.aggregate([
+    {
+      $match: {
+        subcategories: { $exists: true },
+      },
+    },
+    {
+      $project: {
+        category_name: 1,
+        slug: 1,
+        icon: 1,
+        subcategories: 1,
+      },
+    },
+    { $unwind: { path: "$subcategories", preserveNullAndEmptyArrays: false } },
+    { $unwind: { path: "$subcategories.items", preserveNullAndEmptyArrays: false } },
+    {
+      $lookup: {
+        from: "products",
+        localField: "subcategories.items.item_name",
+        foreignField: "item",
+        as: "product_details",
+      },
+    },
+    {
+      $match: {
+        "product_details.0": { $exists: true },
+      },
+    },
+    {
+      $group: {
+        _id: {
+          category_id: "$_id",
+          subcategory_name: "$subcategories.subcategory_name",
+        },
+        category_name: { $first: "$category_name" },
+        slug: { $first: "$slug" },
+        icon: { $first: "$icon" },
+        subcategory_slug: { $first: "$subcategories.slug" },
+        items: { $push: "$subcategories.items" },
+        product_details: { $first: "$product_details" },
+      },
+    },
+    {
+      $match: {
+        items: { $ne: [] },
+      },
+    },
+    {
+      $group: {
+        _id: "$_id.category_id",
+        category_name: { $first: "$category_name" },
+        slug: { $first: "$slug" },
+        icon: { $first: "$icon" },
+        subcategories: {
+          $push: {
+            subcategory_name: "$_id.subcategory_name",
+            slug: "$subcategory_slug",
+            items: "$items",
+            product_details: "$product_details",
+          },
+        },
+      },
+    },
+    {
+      $match: {
+        subcategories: { $ne: [] },
+      },
+    },
+    // {
+    //   $project: {
+    //     _id: 0,
+    //     category_name: 1,
+    //     slug: 1,
+    //     icon: 1,
+    //     subcategories: {
+    //       $map: {
+    //         input: "$subcategories",
+    //         as: "sub",
+    //         in: {
+    //           subcategory_name: "$$sub.subcategory_name",
+    //           slug: "$$sub.slug",
+    //           items: {
+    //             $map: {
+    //               input: "$$sub.items",
+    //               as: "item",
+    //               in: {
+    //                 item_name: "$$item.item_name",
+    //                 slug: "$$item.slug",
+    //                 _id: "$$item._id",
+    //                 id: "$$item.id",
+    //                 product_count: {
+    //                   $size: {
+    //                     $filter: {
+    //                       input: "$$sub.product_details",
+    //                       as: "prod",
+    //                       cond: { $eq: ["$$prod.item", "$$item.item_name"] },
+    //                     },
+    //                   },
+    //                 },
+    //               },
+    //             },
+    //           },
+    //         },
+    //       },
+    //     },
+    //   },
+    // },
+    {
+      $project: {
+        _id: 0,
+        category_name: 1,
+        slug: 1,
+        icon: 1,
+        subcategories: {
+          $map: {
+            input: "$subcategories",
+            as: "sub",
+            in: {
+              subcategory_name: "$$sub.subcategory_name",
+              slug: "$$sub.slug",
+              items: {
+                $filter: {
+                  input: {
+                    $map: {
+                      input: "$$sub.items",
+                      as: "item",
+                      in: {
+                        item_name: "$$item.item_name",
+                        slug: "$$item.slug",
+                        _id: "$$item._id",
+                        id: "$$item.id",
+                        product_count: {
+                          $size: {
+                            $filter: {
+                              input: "$$sub.product_details",
+                              as: "prod",
+                              cond: { $eq: ["$$prod.item", "$$item.item_name"] },
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
+                  as: "item",
+                  cond: { $gt: ["$$item.product_count", 0] },
+                },
+              },
+            },
+          },
+        },
+      },
+    }
+    
+  ]);
 
-// const getCategories = async () => {
-//   const result = await Category.find();
-//   return result;
-// };
+  return result;
+};
+
 
 const getMainCategories = async () => {
   try {
