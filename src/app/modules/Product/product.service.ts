@@ -51,6 +51,11 @@ const createProduct = async (req: any) => {
   } else {
     payload.images = [];
   }
+  if (payload.sale_price && payload.sale_price < payload.price) {
+    payload.onSale = true;
+  } else {
+    payload.onSale = false;
+  }
 
   const result = await Product.create(payload);
   return result;
@@ -58,6 +63,7 @@ const createProduct = async (req: any) => {
 
 // Get all products
 const getAllProducts = async (req: any) => {
+  
   const queryBuilder = new QueryBuilder(
     Product.find(),
     req.query as Record<string, unknown>

@@ -56,6 +56,10 @@ const productSchema = new Schema(
       type: String,
       required: [true, "Currency is required"],
     },
+    onSale: {
+      type: Boolean,
+      required: [false],
+    },
     materials: {
       type: [String],
       required: [true, "At least one material must be specified"],
