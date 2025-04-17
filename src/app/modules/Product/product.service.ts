@@ -95,8 +95,7 @@ const getAllProducts = async (req: any) => {
 // };
 
 const getAllSearch = async (searchQuery: string) => {
-  
-  const result = await Product.find().select("tags");
+  const result = await Product.find().select("tags").limit(50);
 
   if (!result) {
     throw notFound("Product not found");

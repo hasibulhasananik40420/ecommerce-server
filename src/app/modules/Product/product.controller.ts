@@ -64,7 +64,7 @@ const getAllProducts = catchAsync(async (req, res) => {
 
 // Get all products
 const getAllSearch = catchAsync(async (req, res) => {
-  const searchQuery = req?.query?.searchQuery || ''
+  const searchQuery = req?.query?.searchQuery || 'nnnnnnnnnnnnnnn'
   const result = await ProductServices.getAllSearch(searchQuery as string);
   sendResponse(res, {
     statusCode: httpStatus.OK,
