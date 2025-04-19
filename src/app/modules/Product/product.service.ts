@@ -69,7 +69,7 @@ const getAllProducts = async (req: any) => {
     req.query as Record<string, unknown>
   );
   queryBuilder
-    .search([])
+    .search(['name', 'tags'])
     .filter()
     .dateFilter("createdAt")
     .dateFilterOne("createdAt")

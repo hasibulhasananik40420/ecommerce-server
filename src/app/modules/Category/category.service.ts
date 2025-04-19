@@ -223,45 +223,7 @@ const getCategories = async () => {
         subcategories: { $ne: [] },
       },
     },
-    // {
-    //   $project: {
-    //     _id: 0,
-    //     category_name: 1,
-    //     slug: 1,
-    //     icon: 1,
-    //     subcategories: {
-    //       $map: {
-    //         input: "$subcategories",
-    //         as: "sub",
-    //         in: {
-    //           subcategory_name: "$$sub.subcategory_name",
-    //           slug: "$$sub.slug",
-    //           items: {
-    //             $map: {
-    //               input: "$$sub.items",
-    //               as: "item",
-    //               in: {
-    //                 item_name: "$$item.item_name",
-    //                 slug: "$$item.slug",
-    //                 _id: "$$item._id",
-    //                 id: "$$item.id",
-    //                 product_count: {
-    //                   $size: {
-    //                     $filter: {
-    //                       input: "$$sub.product_details",
-    //                       as: "prod",
-    //                       cond: { $eq: ["$$prod.item", "$$item.item_name"] },
-    //                     },
-    //                   },
-    //                 },
-    //               },
-    //             },
-    //           },
-    //         },
-    //       },
-    //     },
-    //   },
-    // },
+   
     {
       $project: {
         _id: 0,

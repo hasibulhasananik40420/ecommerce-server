@@ -9,24 +9,50 @@ class QueryBuilder<T> {
   constructor(modelQuery: Query<T[], T>, query: Record<string, unknown>) {
     this.modelQuery = modelQuery;
     this.query = query;
+    console.log(this.query)
   }
 
-  search(searchableFields: string[]) {
+  // search(searchableFields: string[]) {
     
+  //   const searchTerm = this?.query?.searchTerm as string;
+    
+  //   if (searchTerm) {
+  //     this.modelQuery = this.modelQuery.find({
+  //       $or: searchableFields.map(
+  //         (field) =>
+  //           ({
+  //             [field]: { $regex: searchTerm, $options: "i" },
+  //           }) as FilterQuery<T>
+  //       ),
+  //     });
+  //   }
+  //   return this;
+  // }
+
+  search(searchableFields: string[]) {
     const searchTerm = this?.query?.searchTerm as string;
+    
     if (searchTerm) {
       this.modelQuery = this.modelQuery.find({
-        $or: searchableFields.map(
-          (field) =>
-            ({
+        $or: searchableFields.map((field) => {
+          // Check if the field is "tags" and use $in for array fields, else use $regex for strings
+          if (field === "tags") {
+            return {
+              [field]: { $in: [new RegExp(searchTerm, "i")] },
+            };
+          } else {
+            return {
               [field]: { $regex: searchTerm, $options: "i" },
-            }) as FilterQuery<T>
-        ),
+            };
+          }
+        }),
       });
     }
+  
     return this;
   }
 
+  
   filter() {
     if (this.query.onSale === "true") {
       this.modelQuery = this.modelQuery.find({ onSale: true });
