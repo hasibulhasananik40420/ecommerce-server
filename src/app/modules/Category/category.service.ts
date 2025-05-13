@@ -70,6 +70,8 @@ const createCategory = async (payload: TCategory, file: any) => {
   return result;
 };
  
+
+
 // const getCategories = async () => {
 //   const result = await Category.aggregate([
 //     {
@@ -97,7 +99,7 @@ const createCategory = async (payload: TCategory, file: any) => {
 //     },
 //     {
 //       $match: {
-//         "product_details.0": { $exists: true }, // keep only items with products
+//         "product_details.0": { $exists: true },
 //       },
 //     },
 //     {
@@ -111,6 +113,7 @@ const createCategory = async (payload: TCategory, file: any) => {
 //         icon: { $first: "$icon" },
 //         subcategory_slug: { $first: "$subcategories.slug" },
 //         items: { $push: "$subcategories.items" },
+//         product_details: { $first: "$product_details" },
 //       },
 //     },
 //     {
@@ -129,6 +132,7 @@ const createCategory = async (payload: TCategory, file: any) => {
 //             subcategory_name: "$_id.subcategory_name",
 //             slug: "$subcategory_slug",
 //             items: "$items",
+//             product_details: "$product_details",
 //           },
 //         },
 //       },
@@ -144,14 +148,49 @@ const createCategory = async (payload: TCategory, file: any) => {
 //         category_name: 1,
 //         slug: 1,
 //         icon: 1,
-//         subcategories: 1,
+//         subcategories: {
+//           $map: {
+//             input: "$subcategories",
+//             as: "sub",
+//             in: {
+//               subcategory_name: "$$sub.subcategory_name",
+//               slug: "$$sub.slug",
+//               items: {
+//                 $filter: {
+//                   input: {
+//                     $map: {
+//                       input: "$$sub.items",
+//                       as: "item",
+//                       in: {
+//                         item_name: "$$item.item_name",
+//                         slug: "$$item.slug",
+//                         _id: "$$item._id",
+//                         id: "$$item.id",
+//                         product_count: {
+//                           $size: {
+//                             $filter: {
+//                               input: "$$sub.product_details",
+//                               as: "prod",
+//                               cond: { $eq: ["$$prod.item", "$$item.item_name"] },
+//                             },
+//                           },
+//                         },
+//                       },
+//                     },
+//                   },
+//                   as: "item",
+//                   cond: { $gt: ["$$item.product_count", 0] }, // Filter out items with 0 product count
+//                 },
+//               },
+//             },
+//           },
+//         },
 //       },
 //     },
 //   ]);
 
 //   return result;
 // };
-
 
 const getCategories = async () => {
   const result = await Category.aggregate([
@@ -223,7 +262,6 @@ const getCategories = async () => {
         subcategories: { $ne: [] },
       },
     },
-   
     {
       $project: {
         _id: 0,
@@ -261,15 +299,20 @@ const getCategories = async () => {
                     },
                   },
                   as: "item",
-                  cond: { $gt: ["$$item.product_count", 0] },
+                  cond: { $gt: ["$$item.product_count", 0] }, // Only include items with products
                 },
               },
             },
           },
         },
       },
-    }
-    
+    },
+    {
+      // Ensure that subcategories without any items with products are filtered out
+      $match: {
+        "subcategories.items": { $ne: [] }, // Only include subcategories with items that have product_count > 0
+      },
+    },
   ]);
 
   return result;

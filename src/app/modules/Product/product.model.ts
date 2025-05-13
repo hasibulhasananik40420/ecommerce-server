@@ -91,7 +91,7 @@ const productSchema = new Schema(
             },
             image: {
               type: [String],
-              required : [true, 'just image']
+               required: [true, "Image is required"]
             },
             price: {
               type: Number,

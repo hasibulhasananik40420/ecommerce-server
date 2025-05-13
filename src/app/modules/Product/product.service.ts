@@ -24,7 +24,6 @@ import { Review } from "../Review/review.model";
 //         compressedPath
 //       );
 //       profile = result.url as string;
-//       console.log(profile, "Uploaded primary image");
 //     } catch (error) {
 //       throw serverError("Failed to upload the primary image.");
 //     }
@@ -51,27 +50,130 @@ import { Review } from "../Review/review.model";
 //   } else {
 //     payload.images = [];
 //   }
+
+//   // Process Attributes (with images)
+//   if (payload.attributes && Array.isArray(payload.attributes)) {
+//     console.log("Attributes received for processing:", payload.attributes);
+
+//     const attributeUploadPromises = payload.attributes.map(
+//       async (attribute, index) => {
+//         console.log(`Processing attribute ${index + 1}:`, attribute);
+
+//         if (attribute.values && Array.isArray(attribute.values)) {
+//           console.log(
+//             `Found ${attribute.values.length} values for attribute ${index + 1}`
+//           );
+
+//           const valuesWithImages = await Promise.all(
+//             attribute.values.map(async (value, valueIndex) => {
+//               console.log(
+//                 `Processing value ${valueIndex + 1} of attribute ${index + 1}:`,
+//                 value
+//               );
+
+//               if (
+//                 value.image &&
+//                 typeof value.image === "object" &&
+//                 "path" in value.image &&
+//                 "filename" in value.image
+//               ) {
+//                 console.log(
+//                   `Image found for value ${valueIndex + 1} of attribute ${index + 1}:`,
+//                   value.image
+//                 );
+
+//                 try {
+//                   const compressedPath =
+//                     "uploads/compressed_" +
+//                     (value.image as { filename: string }).filename;
+//                   console.log(
+//                     `Compressing image for value ${valueIndex + 1} at path:`,
+//                     value.image.path
+//                   );
+
+//                   await compressImage(
+//                     (value.image as { path: string }).path,
+//                     compressedPath
+//                   );
+//                   console.log(
+//                     `Image compressed successfully to:`,
+//                     compressedPath
+//                   );
+
+//                   const result = await sendImageToCloudinary(
+//                     (value.image as { filename: string }).filename,
+//                     compressedPath
+//                   );
+//                   console.log(
+//                     `Image uploaded successfully to Cloudinary:`,
+//                     result
+//                   );
+
+//                   return {
+//                     ...value,
+//                     image: [result.url],
+//                   };
+//                 } catch (error) {
+//                   console.error(
+//                     `Error processing image for value ${valueIndex + 1}:`,
+//                     error
+//                   );
+//                   throw error; // Re-throw to stop further processing in case of failure
+//                 }
+//               } else {
+//                 console.log(
+//                   `No valid image found for value ${valueIndex + 1} of attribute ${index + 1}`
+//                 );
+//                 return value; // If no valid image is found, return the value as is
+//               }
+//             })
+//           );
+
+//           console.log(`Processed all values for attribute ${index + 1}`);
+//           return { ...attribute, values: valuesWithImages };
+//         }
+
+//         console.log(`No values found for attribute ${index + 1}`);
+//         return attribute;
+//       }
+//     );
+
+//     payload.attributes = (await Promise.all(attributeUploadPromises)) as {
+//       attribute_name: string;
+//       values: {
+//         value: string;
+//         price: number;
+//         image: string[];
+//         size?: string[];
+//         quantity?: number;
+//       }[];
+//     }[];
+
+//     console.log("Final processed attributes:", payload.attributes);
+//   }
+
+//   // Handle Sale Price Logic
 //   if (payload.sale_price && payload.sale_price < payload.price) {
 //     payload.onSale = true;
 //   } else {
 //     payload.onSale = false;
 //   }
 
+//   // Create Product in Database
 //   const result = await Product.create(payload);
 //   return result;
 // };
 
-const createProduct = async (req : any) => {
+const createProduct = async (req: any) => {
   const payload = req.body as TProduct;
   const filesMap = req.files as { [fieldname: string]: Express.Multer.File[] };
 
-  // Primary image (single)
+  // Handle Primary Image
   let profile = "";
   if (filesMap?.file && filesMap.file.length > 0) {
     try {
       const compressedPath = "uploads/compressed_" + filesMap.file[0].filename;
       await compressImage(filesMap.file[0].path, compressedPath);
-
       const result = await sendImageToCloudinary(
         filesMap.file[0].filename,
         compressedPath
@@ -81,22 +183,18 @@ const createProduct = async (req : any) => {
       throw serverError("Failed to upload the primary image.");
     }
   }
-
   payload.image = profile;
 
-  // Gallery images (multiple - parallel upload using Promise.all)
+  // Handle Gallery Images
   if (filesMap?.files && filesMap.files.length > 0) {
     try {
       const uploadPromises = filesMap.files.map(async (file) => {
-        const compressedPath = "uploads/compressed_" + file.filename; // Define the compressed path
-        await compressImage(file.path, compressedPath); // Compress image
+        const compressedPath = "uploads/compressed_" + file.filename;
+        await compressImage(file.path, compressedPath);
         return sendImageToCloudinary(file.filename, compressedPath);
       });
-
       const uploadResults = await Promise.all(uploadPromises);
-
-      const imageUrls = uploadResults.map((res) => res.url as string);
-      payload.images = imageUrls;
+      payload.images = uploadResults.map((res) => res.url as string);
     } catch (err) {
       throw serverError("One or more gallery images failed to upload.");
     }
@@ -104,58 +202,74 @@ const createProduct = async (req : any) => {
     payload.images = [];
   }
 
-  // Process Attributes (with images)
+  // Handle Attribute Images
+  const attributeImagesMap = filesMap.attribute_images || [];
   if (payload.attributes && Array.isArray(payload.attributes)) {
-    const attributeUploadPromises = payload.attributes.map(async (attribute) => {
-      if (attribute.values && Array.isArray(attribute.values)) {
-        const valuesWithImages = await Promise.all(
-          attribute.values.map(async (value) => {
-            if (value.image && typeof value.image === "object" && "path" in value.image && "filename" in value.image) {
-              const compressedPath = "uploads/compressed_" + (value.image as { filename: string }).filename;
-              await compressImage((value.image as { path: string }).path, compressedPath);
+    const attributeUploadPromises = payload.attributes.map(
+      async (attribute, attributeIndex) => {
+        if (attribute.values && Array.isArray(attribute.values)) {
+          const valuesWithImages = await Promise.all(
+            attribute.values.map(async (value, valueIndex) => {
+              const attributeImage =
+                filesMap.attribute_images?.[valueIndex] || null;
 
+              if (!attributeImage) {
+                throw serverError(
+                  `Missing image for value ${valueIndex + 1} of attribute ${
+                    attributeIndex + 1
+                  }`
+                );
+              }
+
+              const compressedPath =
+                "uploads/compressed_" + attributeImage.filename;
+              await compressImage(attributeImage.path, compressedPath);
               const result = await sendImageToCloudinary(
-                (value.image as { filename: string }).filename,
+                attributeImage.filename,
                 compressedPath
               );
-              return {
-                ...value,
-                image: [result.url], // Ensure image is an array of strings
-              };
-            }
-            return value;
-          })
-        );
-        return { ...attribute, values: valuesWithImages };
-      }
-      return attribute;
-    });
 
-    payload.attributes = await Promise.all(attributeUploadPromises) as { attribute_name: string; values: { value: string; price: number; image: string[]; size?: string[]; quantity?: number; }[]; }[];
+              return { ...value, image: [result.url] };
+            })
+          );
+
+          return { ...attribute, values: valuesWithImages };
+        }
+
+        return attribute;
+      }
+    );
+    // payload.attributes = await Promise.all(attributeUploadPromises);
+
+    payload.attributes = (await Promise.all(attributeUploadPromises)) as {
+      attribute_name: string;
+      values: {
+        value: string;
+        price: number;
+        image: string[];
+        size?: string[];
+        quantity?: number;
+      }[];
+    }[];
   }
 
   // Handle Sale Price Logic
-  if (payload.sale_price && payload.sale_price < payload.price) {
-    payload.onSale = true;
-  } else {
-    payload.onSale = false;
-  }
+  payload.onSale =
+    payload.sale_price && payload.sale_price < payload.price ? true : false;
 
   // Create Product in Database
   const result = await Product.create(payload);
   return result;
 };
 
-
 // Get all products
 const getAllProducts = async (req: any) => {
-  
   const queryBuilder = new QueryBuilder(
     Product.find(),
     req.query as Record<string, unknown>
   );
   queryBuilder
-    .search(['name', 'tags'])
+    .search(["name", "tags"])
     .filter()
     .dateFilter("createdAt")
     .dateFilterOne("createdAt")
