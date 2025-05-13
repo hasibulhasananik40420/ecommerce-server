@@ -85,8 +85,13 @@ const productSchema = new Schema(
               type: String,
               required: [true, "Attribute value is required"],
             },
-            image: {
+            size: {
               type: String,
+              required: false,
+            },
+            image: {
+              type: [String],
+              required : [true, 'just image']
             },
             price: {
               type: Number,

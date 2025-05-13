@@ -16,14 +16,15 @@ export type TProduct = {
   price: number;
   sale_price?: number;
   stock: number;
-  availability: "In Stock" | "Out of Stock" | "Preorder";
+  availability: "In Stock" | "Out of Stock" | "Pre Order";
   attributes: {
     attribute_name: string;
     values: {
       value: string;
       price: number;
-      image?: string;
-      quantity: number;
+      image: string[];
+      size?: string[];
+      quantity?: number;
     }[];
   }[];
   weight?: number;

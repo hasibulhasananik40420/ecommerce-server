@@ -8,7 +8,60 @@ import { Review } from "../Review/review.model";
 
 // Create a new product
 
-const createProduct = async (req: any) => {
+// const createProduct = async (req: any) => {
+//   const payload = req.body as TProduct;
+//   const filesMap = req.files as { [fieldname: string]: Express.Multer.File[] };
+
+//   // Primary image (single)
+//   let profile = "";
+//   if (filesMap?.file && filesMap.file.length > 0) {
+//     try {
+//       const compressedPath = "uploads/compressed_" + filesMap.file[0].filename;
+//       await compressImage(filesMap.file[0].path, compressedPath);
+
+//       const result = await sendImageToCloudinary(
+//         filesMap.file[0].filename,
+//         compressedPath
+//       );
+//       profile = result.url as string;
+//       console.log(profile, "Uploaded primary image");
+//     } catch (error) {
+//       throw serverError("Failed to upload the primary image.");
+//     }
+//   }
+
+//   payload.image = profile;
+
+//   // Gallery images (multiple - parallel upload using Promise.all)
+//   if (filesMap?.files && filesMap.files.length > 0) {
+//     try {
+//       const uploadPromises = filesMap.files.map(async (file) => {
+//         const compressedPath = "uploads/compressed_" + file.filename; // Define the compressed path
+//         await compressImage(file.path, compressedPath); // Compress image
+//         return sendImageToCloudinary(file.filename, compressedPath);
+//       });
+
+//       const uploadResults = await Promise.all(uploadPromises);
+
+//       const imageUrls = uploadResults.map((res) => res.url as string);
+//       payload.images = imageUrls;
+//     } catch (err) {
+//       throw serverError("One or more gallery images failed to upload.");
+//     }
+//   } else {
+//     payload.images = [];
+//   }
+//   if (payload.sale_price && payload.sale_price < payload.price) {
+//     payload.onSale = true;
+//   } else {
+//     payload.onSale = false;
+//   }
+
+//   const result = await Product.create(payload);
+//   return result;
+// };
+
+const createProduct = async (req : any) => {
   const payload = req.body as TProduct;
   const filesMap = req.files as { [fieldname: string]: Express.Multer.File[] };
 
@@ -24,7 +77,6 @@ const createProduct = async (req: any) => {
         compressedPath
       );
       profile = result.url as string;
-      console.log(profile, "Uploaded primary image");
     } catch (error) {
       throw serverError("Failed to upload the primary image.");
     }
@@ -51,15 +103,49 @@ const createProduct = async (req: any) => {
   } else {
     payload.images = [];
   }
+
+  // Process Attributes (with images)
+  if (payload.attributes && Array.isArray(payload.attributes)) {
+    const attributeUploadPromises = payload.attributes.map(async (attribute) => {
+      if (attribute.values && Array.isArray(attribute.values)) {
+        const valuesWithImages = await Promise.all(
+          attribute.values.map(async (value) => {
+            if (value.image && typeof value.image === "object" && "path" in value.image && "filename" in value.image) {
+              const compressedPath = "uploads/compressed_" + (value.image as { filename: string }).filename;
+              await compressImage((value.image as { path: string }).path, compressedPath);
+
+              const result = await sendImageToCloudinary(
+                (value.image as { filename: string }).filename,
+                compressedPath
+              );
+              return {
+                ...value,
+                image: [result.url], // Ensure image is an array of strings
+              };
+            }
+            return value;
+          })
+        );
+        return { ...attribute, values: valuesWithImages };
+      }
+      return attribute;
+    });
+
+    payload.attributes = await Promise.all(attributeUploadPromises) as { attribute_name: string; values: { value: string; price: number; image: string[]; size?: string[]; quantity?: number; }[]; }[];
+  }
+
+  // Handle Sale Price Logic
   if (payload.sale_price && payload.sale_price < payload.price) {
     payload.onSale = true;
   } else {
     payload.onSale = false;
   }
 
+  // Create Product in Database
   const result = await Product.create(payload);
   return result;
 };
+
 
 // Get all products
 const getAllProducts = async (req: any) => {
