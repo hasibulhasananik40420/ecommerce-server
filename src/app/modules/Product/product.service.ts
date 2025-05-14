@@ -203,7 +203,7 @@ const createProduct = async (req: any) => {
   }
 
   // Handle Attribute Images
-  // const attributeImagesMap = filesMap.attribute_images || [];
+  const attributeImagesMap = filesMap.attribute_images || [];
   if (payload.variants && Array.isArray(payload.variants)) {
     const attributeUploadPromises = payload.variants.map(
       async (attribute, attributeIndex) => {

@@ -89,7 +89,7 @@ const productSchema = new Schema<TProduct>(
             sizes: [{
               size: {
                 type: String,
-                required: [true, "Size is required"],
+                // required: [true, "Size is required"],
               },
               stock: {
                 type: Number,
@@ -156,7 +156,7 @@ productSchema.pre("save", function (next) {
   let minPrice = Infinity;
   let maxPrice = -Infinity;
 
-  product.attributes.forEach((attribute: any) => {
+  product.variants.forEach((attribute: any) => {
     attribute.values = attribute.values.filter(
       (value: any) => value.quantity > 0
     );
