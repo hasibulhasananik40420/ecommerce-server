@@ -17,8 +17,8 @@ export type TProduct = {
   sale_price?: number;
   stock: number;
   availability: "In Stock" | "Out of Stock" | "Pre Order";
-  attributes: {
-    attribute_name: string;
+  variants: {
+    variant_name: string;
     values: {
       value: string;
       price: number;

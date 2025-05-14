@@ -203,9 +203,9 @@ const createProduct = async (req: any) => {
   }
 
   // Handle Attribute Images
-  const attributeImagesMap = filesMap.attribute_images || [];
-  if (payload.attributes && Array.isArray(payload.attributes)) {
-    const attributeUploadPromises = payload.attributes.map(
+  // const attributeImagesMap = filesMap.attribute_images || [];
+  if (payload.variants && Array.isArray(payload.variants)) {
+    const attributeUploadPromises = payload.variants.map(
       async (attribute, attributeIndex) => {
         if (attribute.values && Array.isArray(attribute.values)) {
           const valuesWithImages = await Promise.all(
@@ -241,8 +241,8 @@ const createProduct = async (req: any) => {
     );
     // payload.attributes = await Promise.all(attributeUploadPromises);
 
-    payload.attributes = (await Promise.all(attributeUploadPromises)) as {
-      attribute_name: string;
+    payload.variants = (await Promise.all(attributeUploadPromises)) as {
+      variant_name: string;
       values: {
         value: string;
         price: number;
