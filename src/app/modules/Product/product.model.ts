@@ -1,6 +1,7 @@
 import { Schema, model } from "mongoose";
+import { TProduct } from "./product.interface";
 
-const productSchema = new Schema(
+const productSchema = new Schema<TProduct>(
   {
     name: {
       type: String,
@@ -73,9 +74,9 @@ const productSchema = new Schema(
       enum: ["In Stock", "Out of Stock", "Preorder"],
       default: "In Stock",
     },
-    attributes: [
+    variants: [
       {
-        attribute_name: {
+        variant_name: {
           type: String,
           required: [true, "Attribute name is required"],
         },
@@ -85,10 +86,16 @@ const productSchema = new Schema(
               type: String,
               required: [true, "Attribute value is required"],
             },
-            size: {
-              type: String,
-              required: false,
-            },
+            sizes: [{
+              size: {
+                type: String,
+                required: [true, "Size is required"],
+              },
+              stock: {
+                type: Number,
+                required: [true, "Size stock is required"],
+              },
+            }],
             image: {
               type: [String],
                required: [true, "Image is required"]

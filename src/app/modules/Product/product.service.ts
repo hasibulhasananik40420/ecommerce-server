@@ -247,7 +247,7 @@ const createProduct = async (req: any) => {
         value: string;
         price: number;
         image: string[];
-        size?: string[];
+        sizes?: {size : string, stock : Number }[];
         quantity?: number;
       }[];
     }[];
