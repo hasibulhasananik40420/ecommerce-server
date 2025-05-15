@@ -3,7 +3,7 @@ export type TVariant =
     color: string;
     colorCode: string;
     image: string;
-    sizes?: { size: string; stock: Number; price: Number }[];
+    sizes?: { size: string; stock: number; price: number }[];
   }[]
 
 

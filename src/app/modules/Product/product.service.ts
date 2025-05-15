@@ -1,6 +1,6 @@
 import { Product } from "./product.model";
 import { notFound, serverError } from "../../utils/errorfunc";
-import { TProduct } from "./product.interface";
+import { TProduct, TVariant } from "./product.interface";
 import QueryBuilder from "../../builder/QueryBuilder";
 import { sendImageToCloudinary } from "../../utils/sendImageToCloudinary";
 import compressImage from "../../utils/compressImage";
@@ -202,119 +202,42 @@ const createProduct = async (req: any) => {
     payload.images = [];
   }
 
-  // Handle Attribute Images
-  const attributeImagesMap = filesMap.attribute_images || [];
-
   if (payload.variants && Array.isArray(payload.variants)) {
     const attributeUploadPromises = payload.variants.map(
       async (variant, variantIndex) => {
-        // if (variant && Array.isArray(variant)) {
-        //   const valuesWithImages = await Promise.all(
-        //     variant.map(async (value, valueIndex) => {
-        //       const attributeImage =
-        //         filesMap.attribute_images?.[valueIndex] || null;
-
-        //       if (!attributeImage) {
-        //         throw serverError(
-        //           `Missing image for value ${valueIndex + 1} of attribute ${
-        //             variantIndex + 1
-        //           }`
-        //         );
-        //       }
-
-        //       const compressedPath =
-        //         "uploads/compressed_" + attributeImage.filename;
-        //       await compressImage(attributeImage.path, compressedPath);
-        //       const result = await sendImageToCloudinary(
-        //         attributeImage.filename,
-        //         compressedPath
-        //       );
-
-        //       return { ...value, image: result.url };
-        //     })
-        //   );
-
-        //   return { ...variant, image: valuesWithImages };
-        // }
-
-       
-
-        // if (variant) {
-          
-
-        //   const valuesWithImages = await Promise.all(
-        //     variant.map(async (value, valueIndex) => {
-        //       const attributeImage =
-        //         filesMap.attribute_images?.[valueIndex] || null;
-
-        //       if (!attributeImage) {
-        //         throw serverError(
-        //           `Missing image for value ${valueIndex + 1} of attribute ${
-        //             variantIndex + 1
-        //           }`
-        //         );
-        //       }
-
-        //       const compressedPath =
-        //         "uploads/compressed_" + attributeImage.filename;
-
-        //       await compressImage(attributeImage.path, compressedPath);
-        //       console.log(
-        //         `Image compressed successfully for value ${valueIndex}`
-        //       );
-
-        //       const result = await sendImageToCloudinary(
-        //         attributeImage.filename,
-        //         compressedPath
-        //       );
-
-        //       return { ...value, image: result.url };
-        //     })
-        //   );
-
-        //   console.log("Final values with images:", valuesWithImages);
-
-        //   return { ...variant, image: valuesWithImages };
-        // }
-
         if (variant && typeof variant === "object" && !Array.isArray(variant)) {
-         
-        
-          const attributeImage = filesMap.attribute_images?.[0] || null; // Assuming the first image is for the variant
-         
-        
+          const attributeImage =
+            filesMap.attribute_images?.[variantIndex] || null;
+
           if (!attributeImage) {
-            throw serverError("Missing image for the single variant");
+            throw serverError("Missing image for the variant");
           }
-        
-          const compressedPath = "uploads/compressed_" + attributeImage.filename;
-         
-        
+
+          const compressedPath =
+            "uploads/compressed_" + attributeImage.filename;
           await compressImage(attributeImage.path, compressedPath);
-          
-        
+
           const result = await sendImageToCloudinary(
             attributeImage.filename,
             compressedPath
           );
-          
-        
+
+          // Validate and return the variant
+          if (!variant.sizes || !Array.isArray(variant.sizes)) {
+            throw serverError(
+              `Sizes are required for variant ${variantIndex + 1}`
+            );
+          }
+
           return { ...variant, image: result.url };
         }
-        
-
         return variant;
       }
     );
-    // payload.attributes = await Promise.all(attributeUploadPromises);
 
-    payload.variants = (await Promise.all(attributeUploadPromises)) as {
-      color: string;
-      colorCode: string;
-      image: string;
-      sizes?: { size: string; stock: Number; price: Number }[];
-    }[];
-    // console.log(payload.variants)
+    payload.variants = (await Promise.all(attributeUploadPromises)) as TVariant;
+
+    // Debugging payload after processing
   }
 
   // Handle Sale Price Logic
@@ -324,8 +247,12 @@ const createProduct = async (req: any) => {
       : false;
 
   // Create Product in Database
-  const result = await Product.create(payload);
-  return result;
+ 
+
+  const product = new Product(payload);
+  await product.save();
+
+  return product;
 };
 
 // Get all products
@@ -352,19 +279,6 @@ const getAllProducts = async (req: any) => {
   }
   return { result, meta };
 };
-
-// const getAllSearch = async () => {
-//   const result = await Product.find().select('tags');
-
-//   if (!result) {
-//     throw notFound("Product not found");
-//   }
-
-//   // Flatten and eliminate duplicates
-//   const allTags = [...new Set(result.flatMap(product => product.tags))];
-
-//   return {tags : allTags};
-// };
 
 const getAllSearch = async (searchQuery: string) => {
   const result = await Product.find().select("tags").limit(50);

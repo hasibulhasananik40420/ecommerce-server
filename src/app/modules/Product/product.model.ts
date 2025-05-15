@@ -74,6 +74,40 @@ const productSchema = new Schema<TProduct>(
       enum: ["In Stock", "Out of Stock", "Preorder"],
       default: "In Stock",
     },
+    // variants: [
+    //   {
+    //     color: {
+    //       type: String,
+    //       required: [true, "Color is required"],
+    //     },
+    //     colorCode: {
+    //       type: String,
+    //       required: [true, "Color code is required"],
+    //     },
+    //     image: {
+    //       type: String, // Array of images
+    //       required: [true, "Image is required"],
+    //     },
+    //     sizes: [
+    //       {
+    //         size: {
+    //           type: String,
+    //           required: [true, "Size is required"],
+    //         },
+    //         stock: {
+    //           type: Number,
+    //           required: [true, "Stock is required"],
+    //         },
+    //         price: {
+    //           type: Number,
+    //           required: [true, "Price is required"],
+    //         },
+    //       },
+    //     ],
+    //   },
+    // ],
+    
+
     variants: [
       {
         color: {
@@ -85,25 +119,28 @@ const productSchema = new Schema<TProduct>(
           required: [true, "Color code is required"],
         },
         image: {
-          type: String, // Array of images
+          type: String,
           required: [true, "Image is required"],
         },
-        sizes: [
-          {
-            size: {
-              type: String,
-              required: [true, "Size is required"],
+        sizes: {
+          type: [
+            {
+              size: {
+                type: String,
+                required: [true, "Size is required"],
+              },
+              stock: {
+                type: Number,
+                required: [true, "Stock is required"],
+              },
+              price: {
+                type: Number,
+                required: [true, "Price is required"],
+              },
             },
-            stock: {
-              type: Number,
-              required: [true, "Stock is required"],
-            },
-            price: {
-              type: Number,
-              required: [true, "Price is required"],
-            },
-          },
-        ],
+          ],
+          required: [true, "Sizes are required"], // Ensure this is defined
+        },
       },
     ],
     
@@ -145,26 +182,56 @@ const productSchema = new Schema<TProduct>(
   { timestamps: true }
 );
 
+// productSchema.pre("save", function (next) {
+//   const product = this as any;
+
+//   let minPrice = Infinity;
+//   let maxPrice = -Infinity;
+
+//   product.variants.forEach((variant: any) => {
+//     variant.sizes = variant.sizes.filter(
+//       (value: any) => value.quantity > 0
+//     );
+//     variant.sizes.forEach((value: any) => {
+//       if (value.price < minPrice) minPrice = value.price;
+//       if (value.price > maxPrice) maxPrice = value.price;
+//     });
+//   });
+
+//   product.min_price = minPrice === Infinity ? 0 : minPrice;
+//   product.max_price = maxPrice === -Infinity ? 0 : maxPrice;
+
+//   next();
+// });
+
 productSchema.pre("save", function (next) {
-  const product = this as any;
+  const product = this;
 
   let minPrice = Infinity;
   let maxPrice = -Infinity;
 
-  product.variants.forEach((variant: any) => {
-    variant.sizes = variant.sizes.filter(
-      (value: any) => value.quantity > 0
-    );
-    variant.sizes.forEach((value: any) => {
-      if (value.price < minPrice) minPrice = value.price;
-      if (value.price > maxPrice) maxPrice = value.price;
+  // Check if product.variants exists and is an array
+  if (product.variants && Array.isArray(product.variants)) {
+    product.variants.forEach((variant) => {
+      if (variant.sizes && Array.isArray(variant.sizes)) {
+        // Filter sizes based on stock and price
+        variant.sizes = variant.sizes.filter(
+          (size) => size?.stock > 0 && size?.price > 0
+        );
+
+        variant.sizes.forEach((size) => {
+          if (size.price < minPrice) minPrice = size.price;
+          if (size.price > maxPrice) maxPrice = size.price;
+        });
+      }
     });
-  });
+  }
 
   product.min_price = minPrice === Infinity ? 0 : minPrice;
   product.max_price = maxPrice === -Infinity ? 0 : maxPrice;
 
   next();
 });
+
 
 export const Product = model("Product", productSchema);
