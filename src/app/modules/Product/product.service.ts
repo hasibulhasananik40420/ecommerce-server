@@ -204,58 +204,124 @@ const createProduct = async (req: any) => {
 
   // Handle Attribute Images
   const attributeImagesMap = filesMap.attribute_images || [];
+
   if (payload.variants && Array.isArray(payload.variants)) {
     const attributeUploadPromises = payload.variants.map(
-      async (attribute, attributeIndex) => {
-        if (attribute.values && Array.isArray(attribute.values)) {
-          const valuesWithImages = await Promise.all(
-            attribute.values.map(async (value, valueIndex) => {
-              const attributeImage =
-                filesMap.attribute_images?.[valueIndex] || null;
+      async (variant, variantIndex) => {
+        // if (variant && Array.isArray(variant)) {
+        //   const valuesWithImages = await Promise.all(
+        //     variant.map(async (value, valueIndex) => {
+        //       const attributeImage =
+        //         filesMap.attribute_images?.[valueIndex] || null;
 
-              if (!attributeImage) {
-                throw serverError(
-                  `Missing image for value ${valueIndex + 1} of attribute ${
-                    attributeIndex + 1
-                  }`
-                );
-              }
+        //       if (!attributeImage) {
+        //         throw serverError(
+        //           `Missing image for value ${valueIndex + 1} of attribute ${
+        //             variantIndex + 1
+        //           }`
+        //         );
+        //       }
 
-              const compressedPath =
-                "uploads/compressed_" + attributeImage.filename;
-              await compressImage(attributeImage.path, compressedPath);
-              const result = await sendImageToCloudinary(
-                attributeImage.filename,
-                compressedPath
-              );
+        //       const compressedPath =
+        //         "uploads/compressed_" + attributeImage.filename;
+        //       await compressImage(attributeImage.path, compressedPath);
+        //       const result = await sendImageToCloudinary(
+        //         attributeImage.filename,
+        //         compressedPath
+        //       );
 
-              return { ...value, image: [result.url] };
-            })
+        //       return { ...value, image: result.url };
+        //     })
+        //   );
+
+        //   return { ...variant, image: valuesWithImages };
+        // }
+
+       
+
+        // if (variant) {
+          
+
+        //   const valuesWithImages = await Promise.all(
+        //     variant.map(async (value, valueIndex) => {
+        //       const attributeImage =
+        //         filesMap.attribute_images?.[valueIndex] || null;
+
+        //       if (!attributeImage) {
+        //         throw serverError(
+        //           `Missing image for value ${valueIndex + 1} of attribute ${
+        //             variantIndex + 1
+        //           }`
+        //         );
+        //       }
+
+        //       const compressedPath =
+        //         "uploads/compressed_" + attributeImage.filename;
+
+        //       await compressImage(attributeImage.path, compressedPath);
+        //       console.log(
+        //         `Image compressed successfully for value ${valueIndex}`
+        //       );
+
+        //       const result = await sendImageToCloudinary(
+        //         attributeImage.filename,
+        //         compressedPath
+        //       );
+
+        //       return { ...value, image: result.url };
+        //     })
+        //   );
+
+        //   console.log("Final values with images:", valuesWithImages);
+
+        //   return { ...variant, image: valuesWithImages };
+        // }
+
+        if (variant && typeof variant === "object" && !Array.isArray(variant)) {
+         
+        
+          const attributeImage = filesMap.attribute_images?.[0] || null; // Assuming the first image is for the variant
+         
+        
+          if (!attributeImage) {
+            throw serverError("Missing image for the single variant");
+          }
+        
+          const compressedPath = "uploads/compressed_" + attributeImage.filename;
+         
+        
+          await compressImage(attributeImage.path, compressedPath);
+          
+        
+          const result = await sendImageToCloudinary(
+            attributeImage.filename,
+            compressedPath
           );
-
-          return { ...attribute, values: valuesWithImages };
+          
+        
+          return { ...variant, image: result.url };
         }
+        
 
-        return attribute;
+        return variant;
       }
     );
     // payload.attributes = await Promise.all(attributeUploadPromises);
 
     payload.variants = (await Promise.all(attributeUploadPromises)) as {
-      variant_name: string;
-      values: {
-        value: string;
-        price: number;
-        image: string[];
-        sizes?: {size : string, stock : Number }[];
-        quantity?: number;
-      }[];
+      color: string;
+      colorCode: string;
+      image: string;
+      sizes?: { size: string; stock: Number; price: Number }[];
     }[];
+    // console.log(payload.variants)
   }
 
   // Handle Sale Price Logic
   payload.onSale =
-    payload.discountPrice && payload.discountPrice < payload.price ? true : false;
+    payload.discountPrice && payload.discountPrice < payload.price
+      ? true
+      : false;
 
   // Create Product in Database
   const result = await Product.create(payload);

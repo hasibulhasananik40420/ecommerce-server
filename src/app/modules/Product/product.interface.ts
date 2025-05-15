@@ -1,3 +1,12 @@
+export type TVariant = 
+  {
+    color: string;
+    colorCode: string;
+    image: string;
+    sizes?: { size: string; stock: Number; price: Number }[];
+  }[]
+
+
 export type TProduct = {
   name: string;
   product_type: string;
@@ -17,16 +26,7 @@ export type TProduct = {
   discountPrice?: number;
   stock: number;
   availability: "In Stock" | "Out of Stock" | "Pre Order";
-  variants: {
-    variant_name: string;
-    values: {
-      value: string;
-      price: number;
-      image: string[];
-      sizes?: {size : string, stock : Number}[];
-      quantity?: number;
-    }[];
-  }[];
+  variants?: TVariant;
   weight?: number;
   dimensions: {
     length?: number;

@@ -76,42 +76,37 @@ const productSchema = new Schema<TProduct>(
     },
     variants: [
       {
-        variant_name: {
+        color: {
           type: String,
-          required: [true, "Attribute name is required"],
+          required: [true, "Color is required"],
         },
-        values: [
+        colorCode: {
+          type: String,
+          required: [true, "Color code is required"],
+        },
+        image: {
+          type: String, // Array of images
+          required: [true, "Image is required"],
+        },
+        sizes: [
           {
-            value: {
+            size: {
               type: String,
-              required: [true, "Attribute value is required"],
+              required: [true, "Size is required"],
             },
-            sizes: [{
-              size: {
-                type: String,
-                // required: [true, "Size is required"],
-              },
-              stock: {
-                type: Number,
-                required: [true, "Size stock is required"],
-              },
-            }],
-            image: {
-              type: [String],
-               required: [true, "Image is required"]
+            stock: {
+              type: Number,
+              required: [true, "Stock is required"],
             },
             price: {
               type: Number,
-              required: [true, "Attribute price is required"],
-            },
-            quantity: {
-              type: Number,
-              required: [true, "Attribute quantity is required"],
+              required: [true, "Price is required"],
             },
           },
         ],
       },
     ],
+    
     weight: {
       type: Number,
       default: null,
@@ -156,11 +151,11 @@ productSchema.pre("save", function (next) {
   let minPrice = Infinity;
   let maxPrice = -Infinity;
 
-  product.variants.forEach((attribute: any) => {
-    attribute.values = attribute.values.filter(
+  product.variants.forEach((variant: any) => {
+    variant.sizes = variant.sizes.filter(
       (value: any) => value.quantity > 0
     );
-    attribute.values.forEach((value: any) => {
+    variant.sizes.forEach((value: any) => {
       if (value.price < minPrice) minPrice = value.price;
       if (value.price > maxPrice) maxPrice = value.price;
     });
