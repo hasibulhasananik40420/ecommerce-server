@@ -255,7 +255,7 @@ const createProduct = async (req: any) => {
 
   // Handle Sale Price Logic
   payload.onSale =
-    payload.sale_price && payload.sale_price < payload.price ? true : false;
+    payload.discountPrice && payload.discountPrice < payload.price ? true : false;
 
   // Create Product in Database
   const result = await Product.create(payload);

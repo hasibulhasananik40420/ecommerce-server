@@ -41,7 +41,7 @@ const productSchema = new Schema<TProduct>(
       type: Number,
       required: [true, "Regular price is required"],
     },
-    sale_price: {
+    discountPrice: {
       type: Number,
       default: null,
     },

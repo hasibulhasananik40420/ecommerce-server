@@ -14,7 +14,7 @@ export type TProduct = {
   materials: [string];
   onSale?: boolean;
   price: number;
-  sale_price?: number;
+  discountPrice?: number;
   stock: number;
   availability: "In Stock" | "Out of Stock" | "Pre Order";
   variants: {
