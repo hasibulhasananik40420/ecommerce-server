@@ -5,6 +5,7 @@ import { userRoutes } from '../modules/User/user.route';
 import { categoryRoutes } from '../modules/Category/category.route';
 import { productRoutes } from '../modules/Product/product.routes';
 import { reviewRoutes } from '../modules/Review/review.routes';
+import { shippingAddressRoutes } from '../modules/ShipingAddress/shiping.address.route';
 
 const router = Router();
 
@@ -35,6 +36,10 @@ const moduleRoutes = [
   {
     path: '/notification',
     route: notificationRoutes,
+  },
+  {
+    path: '/shippng-address',
+    route: shippingAddressRoutes,
   },
 
 ];
