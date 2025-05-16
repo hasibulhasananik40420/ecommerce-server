@@ -24,7 +24,7 @@ router.get(
 
 // Update a specific shipping address
 router.patch(
-  "/:id",
+  "/update/:id",
   auth(USER_ROLE.customar),
   shippingAddressControllers.updateShippingAddress
 );

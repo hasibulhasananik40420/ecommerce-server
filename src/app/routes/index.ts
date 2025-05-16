@@ -38,7 +38,7 @@ const moduleRoutes = [
     route: notificationRoutes,
   },
   {
-    path: '/shippng-address',
+    path: '/shipping-address',
     route: shippingAddressRoutes,
   },
 
