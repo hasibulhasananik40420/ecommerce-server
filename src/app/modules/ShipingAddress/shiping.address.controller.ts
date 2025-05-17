@@ -30,6 +30,7 @@ const getMyShippingAddresses = catchAsync(async (req, res) => {
 
 // Update a shipping address
 const updateShippingAddress = catchAsync(async (req, res) => {
+  console.log(req.params.id)
   const result = await shippingAddressServices.updateShippingAddress(req.params.id, req.body);
   sendResponse(res, {
     statusCode: httpStatus.OK,

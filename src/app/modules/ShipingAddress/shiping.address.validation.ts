@@ -13,3 +13,4 @@ const createNotificationSchema = z.object({
 export const NotificationValidation = {
   createNotificationSchema,
 };
+
