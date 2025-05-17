@@ -27,11 +27,13 @@ const getMyShippingAddresses = async (userId: string) => {
 };
 
 // Update a specific shipping address
-const updateShippingAddress = async (id: string, payload: any) => {
-  console.log(id, payload);
+const updateShippingAddress = async (id: string, payload: any) => { 
   const result = await ShippingAddress.findByIdAndUpdate(id, payload, {
     new: true,
   });
+  if(result){
+    throw forbidden('Something error')
+  }
   return result;
 };
 
