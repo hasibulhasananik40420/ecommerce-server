@@ -11,10 +11,12 @@ export type TProduct = {
   name: string;
   product_type: string;
   image: string;
+  sizeChart: string;
   rating: number;
   reviewsCount: number;
   images: string[];
   description: string;
+
   min_price: number;
   max_price: number;
   brand: string;
@@ -24,6 +26,7 @@ export type TProduct = {
   onSale?: boolean;
   price: number;
   discountPrice?: number;
+  discountEndDate?: Date;
   stock: number;
   availability: "In Stock" | "Out of Stock" | "Pre Order";
   variants?: TVariant;

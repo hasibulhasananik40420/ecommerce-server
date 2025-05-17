@@ -5,6 +5,7 @@ import QueryBuilder from "../../builder/QueryBuilder";
 import { sendImageToCloudinary } from "../../utils/sendImageToCloudinary";
 import compressImage from "../../utils/compressImage";
 import { Review } from "../Review/review.model";
+import { sendPdfFileToCloudinary } from "../../utils/sendHtmlToCloudinary";
 
 // Create a new product
 
@@ -166,7 +167,22 @@ import { Review } from "../Review/review.model";
 
 const createProduct = async (req: any) => {
   const payload = req.body as TProduct;
+  const sizeChartPDF = req.files.sizeChart[0] as any;
   const filesMap = req.files as { [fieldname: string]: Express.Multer.File[] };
+  
+
+  // Handle Primary Image
+  let sizeChart = "";
+  if (sizeChartPDF) {
+    try {
+      const result = await sendPdfFileToCloudinary(sizeChartPDF.filename, sizeChartPDF.path);
+      sizeChart = result.url as string;
+    } catch (error) {
+      throw serverError("Failed to upload the image.");
+    }
+  }
+  payload.sizeChart = sizeChart;
+  
 
   // Handle Primary Image
   let profile = "";

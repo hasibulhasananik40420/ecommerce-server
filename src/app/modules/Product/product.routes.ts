@@ -8,6 +8,7 @@ const router = express.Router();
 router.post(
   "/create-product",
   upload.fields([
+    { name: "sizeChart", maxCount: 1 },     
     { name: "file", maxCount: 1 },     
     { name: "files", maxCount: 7 },
     { name: "attribute_images", maxCount: 20 },

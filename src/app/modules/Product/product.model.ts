@@ -23,6 +23,10 @@ const productSchema = new Schema<TProduct>(
       type: String,
       required: [true, "Main image URL is required"],
     },
+    sizeChart: {
+      type: String,
+      required: [true, "Size chart is required"],
+    },
     images: {
       type: [String],
       required: [true, "Additional images are required"],
@@ -74,40 +78,6 @@ const productSchema = new Schema<TProduct>(
       enum: ["In Stock", "Out of Stock", "Preorder"],
       default: "In Stock",
     },
-    // variants: [
-    //   {
-    //     color: {
-    //       type: String,
-    //       required: [true, "Color is required"],
-    //     },
-    //     colorCode: {
-    //       type: String,
-    //       required: [true, "Color code is required"],
-    //     },
-    //     image: {
-    //       type: String, // Array of images
-    //       required: [true, "Image is required"],
-    //     },
-    //     sizes: [
-    //       {
-    //         size: {
-    //           type: String,
-    //           required: [true, "Size is required"],
-    //         },
-    //         stock: {
-    //           type: Number,
-    //           required: [true, "Stock is required"],
-    //         },
-    //         price: {
-    //           type: Number,
-    //           required: [true, "Price is required"],
-    //         },
-    //       },
-    //     ],
-    //   },
-    // ],
-    
-
     variants: [
       {
         color: {
@@ -122,6 +92,7 @@ const productSchema = new Schema<TProduct>(
           type: String,
           required: [true, "Image is required"],
         },
+
         sizes: {
           type: [
             {
@@ -143,7 +114,7 @@ const productSchema = new Schema<TProduct>(
         },
       },
     ],
-    
+
     weight: {
       type: Number,
       default: null,
@@ -175,6 +146,10 @@ const productSchema = new Schema<TProduct>(
       default: "Draft",
     },
     publish_date: {
+      type: Date,
+      default: null,
+    },
+    discountEndDate: {
       type: Date,
       default: null,
     },
@@ -232,6 +207,5 @@ productSchema.pre("save", function (next) {
 
   next();
 });
-
 
 export const Product = model("Product", productSchema);
