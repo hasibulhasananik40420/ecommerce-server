@@ -31,7 +31,7 @@ const updateShippingAddress = async (id: string, payload: any) => {
   const result = await ShippingAddress.findByIdAndUpdate(id, payload, {
     new: true,
   });
-  if(result){
+  if(!result){
     throw forbidden('Something error')
   }
   return result;
